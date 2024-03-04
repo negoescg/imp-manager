@@ -42,9 +42,6 @@ const ProductionListGrid = () => {
     queryFn: async () => getProductionLists(),
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading products</div>;
-
   const initialDataSource = new DataSource({
     store: new CustomStore({
       key: 'id',
@@ -90,7 +87,8 @@ const ProductionListGrid = () => {
       setFileData(json);
     }
   };
-
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading products</div>;
   return (
     <>
       {isAdmin && (

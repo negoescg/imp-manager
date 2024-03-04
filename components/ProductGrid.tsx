@@ -23,9 +23,6 @@ const ProductGrid = () => {
     queryFn: async () => getCategories(),
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading products</div>;
-
   const [productData] = useState(
     new CustomStore({
       key: 'product_id',
@@ -45,7 +42,8 @@ const ProductGrid = () => {
 
     return !data?.some((item) => item.product_id !== itemId && item.sku === options.value);
   };
-
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading products</div>;
   return (
     <DataGrid
       dataSource={productData}

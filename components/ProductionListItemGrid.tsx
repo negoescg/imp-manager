@@ -21,9 +21,6 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
     enabled: !!itemId,
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading inventory items</div>;
-
   const [listItems] = useState(
     new CustomStore({
       key: 'id',
@@ -42,7 +39,8 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
 
     return !data?.some((item) => item.id !== itemId && item.sku === options.value);
   };
-
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading inventory items</div>;
   return (
     <DataGrid
       dataSource={listItems}

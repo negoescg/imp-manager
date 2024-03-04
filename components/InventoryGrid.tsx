@@ -28,8 +28,6 @@ const InventoryGrid = () => {
     queryFn: async () => getUnitOfMeasure(),
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading inventory items</div>;
   const [inventoryData] = useState(
     new CustomStore({
       key: 'item_id',
@@ -49,6 +47,9 @@ const InventoryGrid = () => {
 
     return !data?.some((item) => item.item_id !== itemId && item.item_name === options.value);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading inventory items</div>;
 
   return (
     <DataGrid

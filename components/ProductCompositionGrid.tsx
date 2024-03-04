@@ -26,9 +26,6 @@ const ProductCompositionGrid = ({ itemId }: Props) => {
     queryFn: async () => getInventoryItems(),
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading inventory items</div>;
-
   const [inventoryTransactionData] = useState(
     new CustomStore({
       key: 'composition_id',
@@ -38,7 +35,8 @@ const ProductCompositionGrid = ({ itemId }: Props) => {
       remove: async (key) => deleteProductComposition(key).finally(refetch),
     }),
   );
-
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading inventory items</div>;
   return (
     <DataGrid
       dataSource={inventoryTransactionData}

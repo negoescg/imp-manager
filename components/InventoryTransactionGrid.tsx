@@ -26,9 +26,6 @@ const InventoryTransactionGrid = ({ itemId }: Props) => {
     queryFn: async () => getTransactionTypes(),
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading inventory items</div>;
-
   const [inventoryTransactionData] = useState(
     new CustomStore({
       key: 'transaction_id',
@@ -38,7 +35,8 @@ const InventoryTransactionGrid = ({ itemId }: Props) => {
       remove: async (key) => deleteInventoryItemTransaction(key, itemId).finally(refetch),
     }),
   );
-
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading inventory items</div>;
   return (
     <DataGrid
       dataSource={inventoryTransactionData}

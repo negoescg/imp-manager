@@ -1,0 +1,41 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1709310222192,
+      "tag": "0000_nice_mephisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1709313282457,
+      "tag": "0001_fast_magdalene",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1709394635675,
+      "tag": "0002_natural_sandman",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1709396106616,
+      "tag": "0003_overrated_mantis",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1709481772898,
+      "tag": "0004_lucky_manta",
+      "breakpoints": true
+    }
+  ]
+}

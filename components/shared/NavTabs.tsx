@@ -7,6 +7,14 @@ import React, { useEffect, useState } from 'react';
 export const navLinks = [
   {
     id: 0,
+    text: 'Instructions',
+    icon: 'home',
+    href: '/',
+    visible: false,
+    admin: false,
+  },
+  {
+    id: 1,
     text: 'Inventory',
     icon: 'chart',
     href: '/inventory',
@@ -14,12 +22,20 @@ export const navLinks = [
     admin: true,
   },
   {
-    id: 1,
+    id: 2,
     text: 'Products',
     icon: 'ordersbox',
     href: '/product',
     visible: false,
     admin: true,
+  },
+  {
+    id: 3,
+    text: 'Production Lists',
+    icon: 'bulletlist',
+    href: '/production',
+    visible: false,
+    admin: false,
   },
 ];
 const NavTabs = () => {

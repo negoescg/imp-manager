@@ -43,8 +43,9 @@ const ProductGrid = () => {
       return !data?.some((item) => item.sku === options.value);
     }
 
-    return !data?.some((item) => item.sku !== itemId && item.sku === options.value);
+    return !data?.some((item) => item.product_id !== itemId && item.sku === options.value);
   };
+
   return (
     <DataGrid
       dataSource={productData}

@@ -33,7 +33,7 @@ export const addProduct = async (newItem) => {
       .insert(finalProducts)
       .values(newItem)
       .returning({ insertedId: finalProducts.product_id });
-    newItem.item_id = addedItem[0].insertedId;
+    newItem.product_id = addedItem[0].insertedId;
     return newItem;
   } catch (error) {
     console.error('Failed to add product:', error);
@@ -65,7 +65,7 @@ export const addProductComposition = async (newItem, productId) => {
       .insert(productComposition)
       .values(newItem)
       .returning({ insertedId: productComposition.composition_id });
-    newItem.item_id = addedItem[0].insertedId;
+    newItem.composition_id = addedItem[0].insertedId;
     return newItem;
   } catch (error) {
     console.error('Failed to add product:', error);

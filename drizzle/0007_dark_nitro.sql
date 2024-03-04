@@ -1,0 +1,1 @@
+ALTER TABLE "production_list_items" ALTER COLUMN "completed" SET DEFAULT 0;

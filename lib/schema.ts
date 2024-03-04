@@ -69,8 +69,26 @@ export const inventoryTransactions = pgTable('inventory_transactions', {
 export const productionHistory = pgTable('production_history', {
   production_id: serial('production_id').primaryKey(),
   product_id: integer('product_id').references(() => finalProducts.product_id),
+  product_list_item_id: integer('product_list_item_id').references(() => productionListItems.id),
   date_produced: timestamp('date_produced').defaultNow(),
   quantity_produced: integer('quantity_produced'),
+});
+
+export const productionLists = pgTable('production_lists', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 255 }),
+  list_date: timestamp('list_date').defaultNow(),
+});
+
+export const productionListItems = pgTable('production_list_items', {
+  id: serial('id').primaryKey(),
+  sku: varchar('sku', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  production_list_id: integer('production_list_id')
+    .references(() => productionLists.id)
+    .notNull(),
+  required: integer('required').notNull(),
+  completed: integer('completed').default(0),
 });
 
 export const inventoryItemsRelations = relations(inventoryItems, ({ one, many }) => ({

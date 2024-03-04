@@ -36,6 +36,34 @@
       "when": 1709481772898,
       "tag": "0004_lucky_manta",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1709559052010,
+      "tag": "0005_curved_jubilee",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1709559680242,
+      "tag": "0006_thick_cerebro",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1709562374296,
+      "tag": "0007_dark_nitro",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1709565771546,
+      "tag": "0008_bent_thunderbird",
+      "breakpoints": true
     }
   ]
 }

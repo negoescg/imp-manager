@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en">
         <body className={`${GeistSans.variable} dx-viewport`}>
           <NavTabs />
-          <main className="p-5">
+          <main>
             <Providers>{children}</Providers>
           </main>
         </body>

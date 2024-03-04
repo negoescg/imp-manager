@@ -8,5 +8,5 @@ export default async function Home() {
   // });
 
   // const orgRole = orgList[0].role;
-  return <div>Instruction maybe depending on user role ?</div>;
+  return <div className="p-5">Instruction maybe depending on user role ?</div>;
 }

@@ -71,7 +71,7 @@ const NavTabs = () => {
           });
         }
       }
-    }
+    } else setShowNav(false);
   }, [user, isLoaded, pathname]);
   return showNav ? (
     <div className="flex items-center">

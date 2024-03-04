@@ -27,7 +27,7 @@ const ProductionListGrid = () => {
   const [listDate, setListDate] = useState(new Date());
   const fileUploaderRef = useRef<FileUploader>(null);
   const listsDataGridRef = useRef<DataGrid>(null);
-
+  console.log('test');
   useEffect(() => {
     if (isLoaded && user) {
       if (user.organizationMemberships.length > 0) {

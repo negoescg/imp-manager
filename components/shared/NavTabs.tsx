@@ -72,7 +72,7 @@ const NavTabs = () => {
         }
       }
     }
-  }, [user, isLoaded]);
+  }, [user, isLoaded, pathname]);
   return showNav ? (
     <div className="flex items-center">
       {navLinks.filter((tab) => tab.visible !== false).length !== 0 && (
@@ -80,7 +80,7 @@ const NavTabs = () => {
           id="withIconAndText"
           width="100%"
           visible={showNav}
-          selectedIndex={selectedIndex}
+          selectedItem={navLinks.find((x) => x.id === selectedIndex)}
           dataSource={navLinks.filter((tab) => tab.visible !== false)}
           scrollByContent={false}
           showNavButtons={false}
@@ -88,7 +88,6 @@ const NavTabs = () => {
           stylingMode="secondary"
           iconPosition="top"
           onItemClick={handleClick}
-          onItemRendered={() => <></>}
         />
       )}
       <div className="flex w-full p-3 justify-end">

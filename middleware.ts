@@ -18,7 +18,15 @@ export default authMiddleware({
         (req.nextUrl.pathname.startsWith('/inventory') ||
           req.nextUrl.pathname.startsWith('/product') ||
           req.nextUrl.pathname.startsWith('/user')) &&
-        auth.orgRole !== 'org:admin'
+        auth.orgRole !== 'org:admin' &&
+        !req.nextUrl.pathname.startsWith('/production')
+      ) {
+        return NextResponse.rewrite(new URL('/denied', req.url));
+      }
+      if (
+        req.nextUrl.pathname.startsWith('/production') &&
+        auth.orgRole !== 'org:admin' &&
+        auth.orgRole !== 'org:member'
       ) {
         return NextResponse.rewrite(new URL('/denied', req.url));
       }

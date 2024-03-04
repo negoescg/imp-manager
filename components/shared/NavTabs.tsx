@@ -90,7 +90,7 @@ const NavTabs = () => {
           onItemClick={handleClick}
         />
       )}
-      <div className="flex w-full p-3 justify-end">
+      <div className="flex p-3 justify-end">
         <UserButton />
       </div>
     </div>

@@ -20,6 +20,7 @@ export const getCategories = async () => {
 
 export const deleteProduct = async (itemId: number) => {
   try {
+    await db.delete(productComposition).where(eq(productComposition.product_id, itemId));
     await db.delete(finalProducts).where(eq(finalProducts.product_id, itemId));
   } catch (error) {
     console.error('Failed to delete product:', error);

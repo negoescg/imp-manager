@@ -48,6 +48,7 @@ export const getTransactionTypes = async () => {
 
 export const deleteInventoryItem = async (itemId: number) => {
   try {
+    await db.delete(inventoryTransactions).where(eq(inventoryTransactions.item_id, itemId));
     await db.delete(inventoryItems).where(eq(inventoryItems.item_id, itemId));
   } catch (error) {
     console.error('Failed to delete inventory item:', error);

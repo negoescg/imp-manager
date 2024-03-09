@@ -64,6 +64,20 @@
       "when": 1709565771546,
       "tag": "0008_bent_thunderbird",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1709989244705,
+      "tag": "0009_short_pete_wisdom",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1710000674052,
+      "tag": "0010_sticky_reavers",
+      "breakpoints": true
     }
   ]
 }

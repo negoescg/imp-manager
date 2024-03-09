@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DataGrid, { Column, Paging, Pager, Editing, Lookup, RequiredRule } from 'devextreme-react/data-grid';
 import { useQuery } from '@tanstack/react-query';
 import { getInventoryItems } from '@/server/actions/inventory.actions';
@@ -26,22 +26,29 @@ const ProductCompositionGrid = ({ itemId }: Props) => {
     queryFn: async () => getInventoryItems(),
   });
 
-  const [inventoryTransactionData] = useState(
-    new CustomStore({
-      key: 'composition_id',
-      load: async () => data ?? [],
-      insert: async (values) => addProductComposition(values, itemId).finally(refetch),
-      update: async (key, values) => updateProductComposition(key, values).finally(refetch),
-      remove: async (key) => deleteProductComposition(key).finally(refetch),
-    }),
-  );
+  const [compositionData, setCompositionData] = useState(new CustomStore());
+  useEffect(() => {
+    setCompositionData(
+      new CustomStore({
+        key: 'composition_id',
+        load: async () => data ?? [],
+        insert: async (values) => addProductComposition(values, itemId).finally(refetch),
+        update: async (key, values) => updateProductComposition(key, values).finally(refetch),
+        remove: async (key) => deleteProductComposition(key).finally(refetch),
+      }),
+    );
+  }, [data]);
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading inventory items</div>;
   return (
     <DataGrid
-      dataSource={inventoryTransactionData}
+      dataSource={compositionData}
       keyExpr="composition_id"
+      showColumnLines={true}
+      showRowLines={true}
       showBorders={true}
+      rowAlternationEnabled={true}
       columnAutoWidth={true}
       searchPanel={{ visible: true, width: 240, placeholder: 'Search...' }}>
       <Editing

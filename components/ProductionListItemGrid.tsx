@@ -45,7 +45,10 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
     <DataGrid
       dataSource={listItems}
       keyExpr="id"
+      showColumnLines={true}
+      showRowLines={true}
       showBorders={true}
+      rowAlternationEnabled={true}
       columnAutoWidth={true}
       onInitNewRow={(e) => {
         e.data.completed = 0;
@@ -60,11 +63,11 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
         useIcons={true}
         newRowPosition="first"
       />
-      <Paging enabled={true} defaultPageSize={3} />
+      <Paging enabled={true} defaultPageSize={10} />
       <Pager
         visible={true}
         showPageSizeSelector={true}
-        allowedPageSizes={[3, 10, 20]}
+        allowedPageSizes={[10, 15, 20]}
         showNavigationButtons={true}
         showInfo={true}
       />

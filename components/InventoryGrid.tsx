@@ -1,6 +1,17 @@
 'use client';
 import React, { useState } from 'react';
-import DataGrid, { Column, Paging, Pager, Editing, Lookup, RequiredRule, CustomRule } from 'devextreme-react/data-grid';
+import DataGrid, {
+  Column,
+  Paging,
+  Pager,
+  Editing,
+  Lookup,
+  RequiredRule,
+  CustomRule,
+  MasterDetail,
+  Selection,
+  DataGridTypes,
+} from 'devextreme-react/data-grid';
 import { useQuery } from '@tanstack/react-query';
 import {
   addInventoryItem,
@@ -12,6 +23,7 @@ import {
 } from '@/server/actions/inventory.actions';
 import CustomStore from 'devextreme/data/custom_store';
 import Link from 'next/link';
+import InventoryTransactionGrid from './InventoryTransactionGrid';
 
 const InventoryGrid = () => {
   const { data, isLoading, error, refetch } = useQuery({
@@ -48,6 +60,16 @@ const InventoryGrid = () => {
     return !data?.some((item) => item.item_id !== itemId && item.item_name === options.value);
   };
 
+  const onSelectionChanged = (e: DataGridTypes.SelectionChangedEvent) => {
+    e.component.collapseAll(-1);
+    e.component.expandRow(e.currentSelectedRowKeys[0]);
+  };
+
+  const renderDetail = (props: DataGridTypes.MasterDetailTemplateData) => {
+    const { item_id } = props.data;
+    return <InventoryTransactionGrid itemId={item_id} />;
+  };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading inventory items</div>;
 
@@ -65,7 +87,11 @@ const InventoryGrid = () => {
           e.errorText = 'SKU is required for this item type.';
         }
       }}
+      onSelectionChanged={onSelectionChanged}
+      showColumnLines={true}
+      showRowLines={true}
       showBorders={true}
+      rowAlternationEnabled={true}
       columnAutoWidth={true}
       searchPanel={{ visible: true, width: 240, placeholder: 'Search...' }}>
       <Editing
@@ -77,11 +103,11 @@ const InventoryGrid = () => {
         useIcons={true}
         newRowPosition="first"
       />
-      <Paging enabled={true} defaultPageSize={3} />
+      <Paging enabled={true} defaultPageSize={10} />
       <Pager
         visible={true}
         showPageSizeSelector={true}
-        allowedPageSizes={[3, 10, 20]}
+        allowedPageSizes={[10, 15, 20]}
         showNavigationButtons={true}
         showInfo={true}
       />
@@ -89,7 +115,7 @@ const InventoryGrid = () => {
         <RequiredRule />
         <CustomRule validationCallback={handleUniqueNameValidation} message="Name must be unique" />
       </Column>
-      <Column dataField="item_description" caption="Description" />
+      {/* <Column dataField="item_description" caption="Description" /> */}
       <Column dataField="item_sku" caption="SKU"></Column>
       <Column dataField="quantity" caption="Quantity" allowEditing={false} />
       <Column
@@ -133,6 +159,8 @@ const InventoryGrid = () => {
           }
         }}
       />
+      <Selection mode="single" />
+      <MasterDetail enabled={false} render={renderDetail} />
     </DataGrid>
   );
 };

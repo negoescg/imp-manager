@@ -1,6 +1,13 @@
 'use server';
 import { db } from '@/lib/db';
-import { productionListItems, productionLists } from '@/lib/schema';
+import {
+  finalProducts,
+  inventoryItems,
+  inventoryTransactions,
+  productComposition,
+  productionListItems,
+  productionLists,
+} from '@/lib/schema';
 import { eq } from 'drizzle-orm';
 
 export const getProductionListItems = async (id: number) => {
@@ -49,6 +56,70 @@ export const deleteProductionListItem = async (itemId: number) => {
   } catch (error) {
     console.error('Failed to delete product:', error);
     throw new Error('Failed to delete product.');
+  }
+};
+type Transaction = typeof inventoryTransactions.$inferInsert;
+export const completeProductionList = async (id: number) => {
+  const list = await db.query.productionLists.findFirst({
+    where: eq(productionLists.id, id),
+  });
+  const listItems = await db.select().from(productionListItems).where(eq(productionListItems.production_list_id, id));
+  listItems.forEach(async (element) => {
+    const product = await db.query.finalProducts.findFirst({
+      where: eq(finalProducts.sku, element.sku),
+    });
+    if (product) {
+      if (element.took_from_stock && element.took_from_stock > 0) {
+        const inventory = await db.query.inventoryItems.findFirst({
+          where: eq(inventoryItems.item_sku, product.sku as string),
+        });
+        if (inventory && element.took_from_stock && element.took_from_stock > 0) {
+          const newTransaction = {
+            item_id: inventory.item_id,
+            date_of_transaction: new Date(),
+            expected_date: new Date(),
+            status: 'Confirmed',
+            transaction_type_id: 2,
+            quantity: element.took_from_stock,
+          } as Transaction;
+
+          await db.insert(inventoryTransactions).values(newTransaction);
+          inventory.quantity = (inventory.quantity ?? 0) - (newTransaction.quantity ?? 0);
+          await db.update(inventoryItems).set(inventory).where(eq(inventoryItems.item_id, inventory.item_id));
+        }
+      }
+      if (element.completed && element.completed > 0) {
+        const compositionItems = await db
+          .select()
+          .from(productComposition)
+          .where(eq(productComposition.product_id, product.product_id));
+
+        compositionItems.forEach(async (composition) => {
+          const inventory = await db.query.inventoryItems.findFirst({
+            where: eq(inventoryItems.item_id, composition.item_id as number),
+          });
+          if (inventory && composition.item_id && element.completed && element.completed > 0) {
+            const newTransaction = {
+              item_id: inventory.item_id,
+              date_of_transaction: new Date(),
+              expected_date: new Date(),
+              status: 'Confirmed',
+              transaction_type_id: 2,
+              quantity: element.completed * parseFloat(composition.quantity_required ?? '0'),
+            } as Transaction;
+
+            await db.insert(inventoryTransactions).values(newTransaction);
+            inventory.quantity = (inventory.quantity ?? 0) - (newTransaction.quantity ?? 0);
+            await db.update(inventoryItems).set(inventory).where(eq(inventoryItems.item_id, inventory.item_id));
+          }
+        });
+      }
+    }
+  });
+  try {
+  } catch (error) {
+    console.error('Failed to complete production list:', error);
+    throw new Error('Failed to complete production list.');
   }
 };
 

@@ -64,6 +64,8 @@ export const inventoryTransactions = pgTable('inventory_transactions', {
   quantity: bigint('quantity', { mode: 'number' }),
   price_per_unit: decimal('price_per_unit', { precision: 10, scale: 2 }),
   total_amount: decimal('total_amount', { precision: 10, scale: 2 }),
+  expected_date: timestamp('expected_date').default(new Date(new Date().setDate(new Date().getDate() + 7))),
+  status: varchar('status', { length: 255 }).default('Pending'),
 });
 
 export const productionHistory = pgTable('production_history', {
@@ -78,6 +80,7 @@ export const productionLists = pgTable('production_lists', {
   id: serial('id').primaryKey(),
   name: varchar('name', { length: 255 }),
   list_date: timestamp('list_date').defaultNow(),
+  status: varchar('status', { length: 255 }).default('In Progress'),
 });
 
 export const productionListItems = pgTable('production_list_items', {
@@ -89,6 +92,7 @@ export const productionListItems = pgTable('production_list_items', {
     .notNull(),
   required: integer('required').notNull(),
   completed: integer('completed').default(0),
+  took_from_stock: integer('took_from_stock').default(0),
 });
 
 export const inventoryItemsRelations = relations(inventoryItems, ({ one, many }) => ({

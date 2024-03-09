@@ -1,20 +1,23 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
-import DataGrid, { Column, Paging, Pager, Editing } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Paging, Pager, Editing, DataGridTypes, Button } from 'devextreme-react/data-grid';
 import { useQuery } from '@tanstack/react-query';
 import CustomStore from 'devextreme/data/custom_store';
 import Link from 'next/link';
 import {
   addProductionList,
+  completeProductionList,
   deleteProductionList,
   getProductionLists,
   updateProductionList,
   uploadProductionList,
 } from '@/server/actions/production.actions';
 import { useUser } from '@clerk/nextjs';
-import { Button, DateBox, FileUploader, TextBox, Toast } from 'devextreme-react';
+import { Button as NormalButton, DateBox, FileUploader, TextBox, Toast } from 'devextreme-react';
 import * as XLSX from 'xlsx';
 import DataSource from 'devextreme/data/data_source';
+import StatusCell from './StatusCell';
+import { confirm } from 'devextreme/ui/dialog';
 
 const ProductionListGrid = () => {
   const { user, isLoaded } = useUser();
@@ -87,6 +90,10 @@ const ProductionListGrid = () => {
       setFileData(json);
     }
   };
+  const completeList = async (data) => {
+    await completeProductionList(data.id);
+    refetch();
+  };
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading products</div>;
   return (
@@ -116,17 +123,21 @@ const ProductionListGrid = () => {
             accept=".xlsx"
             uploadMode="useForm"
           />
-          <Button text="Upload" type="default" onClick={submitForm} />
+          <NormalButton text="Upload" type="default" onClick={submitForm} />
         </div>
       )}
       <DataGrid
         ref={listsDataGridRef}
         dataSource={dataSource}
         keyExpr="id"
+        showColumnLines={true}
+        showRowLines={true}
         showBorders={true}
+        rowAlternationEnabled={true}
         columnAutoWidth={true}
         onInitNewRow={(e) => {
           e.data.list_date = new Date();
+          e.data.status = 'In Progress';
         }}
         searchPanel={{ visible: true, width: 240, placeholder: 'Search...' }}>
         <Editing
@@ -138,15 +149,22 @@ const ProductionListGrid = () => {
           useIcons={true}
           newRowPosition="first"
         />
-        <Paging enabled={true} defaultPageSize={3} />
+        <Paging enabled={true} defaultPageSize={10} />
         <Pager
           visible={true}
           showPageSizeSelector={true}
-          allowedPageSizes={[3, 10, 20]}
+          allowedPageSizes={[10, 15, 20]}
           showNavigationButtons={true}
           showInfo={true}
         />
         <Column dataField="name" caption="Name" />
+        <Column
+          dataField="status"
+          caption="Status"
+          dataType="string"
+          allowEditing={false}
+          cellRender={({ value }) => <StatusCell value={value} />}
+        />
         <Column
           dataField="list_date"
           caption="List Date"
@@ -171,6 +189,30 @@ const ProductionListGrid = () => {
             }
           }}
         />
+        <Column type="buttons">
+          <Button
+            text="Complete"
+            icon="todo"
+            hint="Complete List"
+            visible={(options) => {
+              return options.row.data.status === 'In Progress';
+            }}
+            onClick={(e: DataGridTypes.ColumnButtonClickEvent) => {
+              confirm('Are you sure you want to mark this list as completed?', 'Complete List').then((dialogResult) => {
+                if (dialogResult) {
+                  completeList(e.row?.data);
+                }
+              });
+            }}
+          />
+          <Button
+            name="edit"
+            visible={(options) => {
+              return options.row.data.status === 'In Progress';
+            }}
+          />
+          <Button name="delete" />
+        </Column>
       </DataGrid>
       <Toast
         visible={toastVisible}

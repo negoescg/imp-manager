@@ -1,6 +1,17 @@
 'use client';
 import React, { useState } from 'react';
-import DataGrid, { Column, Paging, Pager, Editing, Lookup, RequiredRule, CustomRule } from 'devextreme-react/data-grid';
+import DataGrid, {
+  Column,
+  Paging,
+  Pager,
+  Editing,
+  Lookup,
+  RequiredRule,
+  CustomRule,
+  MasterDetail,
+  DataGridTypes,
+  Selection,
+} from 'devextreme-react/data-grid';
 import { useQuery } from '@tanstack/react-query';
 import CustomStore from 'devextreme/data/custom_store';
 import Link from 'next/link';
@@ -11,6 +22,7 @@ import {
   getFinalProducts,
   updateProduct,
 } from '@/server/actions/product.actions';
+import ProductCompositionGrid from './ProductCompositionGrid';
 
 const ProductGrid = () => {
   const { data, isLoading, error, refetch } = useQuery({
@@ -42,13 +54,25 @@ const ProductGrid = () => {
 
     return !data?.some((item) => item.product_id !== itemId && item.sku === options.value);
   };
+  const renderDetail = (props: DataGridTypes.MasterDetailTemplateData) => {
+    const { product_id } = props.data;
+    return <ProductCompositionGrid itemId={product_id} />;
+  };
+  const onSelectionChanged = (e: DataGridTypes.SelectionChangedEvent) => {
+    e.component.collapseAll(-1);
+    e.component.expandRow(e.currentSelectedRowKeys[0]);
+  };
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading products</div>;
   return (
     <DataGrid
       dataSource={productData}
       keyExpr="product_id"
+      onSelectionChanged={onSelectionChanged}
+      showColumnLines={true}
+      showRowLines={true}
       showBorders={true}
+      rowAlternationEnabled={true}
       columnAutoWidth={true}
       searchPanel={{ visible: true, width: 240, placeholder: 'Search...' }}>
       <Editing
@@ -60,11 +84,11 @@ const ProductGrid = () => {
         useIcons={true}
         newRowPosition="first"
       />
-      <Paging enabled={true} defaultPageSize={3} />
+      <Paging enabled={true} defaultPageSize={10} />
       <Pager
         visible={true}
         showPageSizeSelector={true}
-        allowedPageSizes={[3, 10, 20]}
+        allowedPageSizes={[10, 15, 20]}
         showNavigationButtons={true}
         showInfo={true}
       />
@@ -97,6 +121,8 @@ const ProductGrid = () => {
           }
         }}
       />
+      <Selection mode="single" />
+      <MasterDetail enabled={false} render={renderDetail} />
     </DataGrid>
   );
 };

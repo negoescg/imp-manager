@@ -1,0 +1,1 @@
+ALTER TABLE "inventory_transactions" ALTER COLUMN "expected_date" SET DEFAULT '2024-03-17 16:48:44.449';

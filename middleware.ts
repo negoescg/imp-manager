@@ -17,6 +17,7 @@ export default authMiddleware({
       if (
         (req.nextUrl.pathname.startsWith('/inventory') ||
           req.nextUrl.pathname.startsWith('/product') ||
+          req.nextUrl.pathname.startsWith('/category') ||
           req.nextUrl.pathname.startsWith('/user')) &&
         auth.orgRole !== 'org:admin' &&
         !req.nextUrl.pathname.startsWith('/production')

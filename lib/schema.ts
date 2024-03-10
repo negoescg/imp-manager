@@ -56,6 +56,13 @@ export const productComposition = pgTable('product_composition', {
   quantity_required: decimal('quantity_required', { precision: 10, scale: 2 }),
 });
 
+export const productCategoryCompositionTemplate = pgTable('category_template_composition', {
+  id: serial('id').primaryKey(),
+  category_id: integer('category_id').references(() => categories.category_id),
+  item_id: integer('item_id').references(() => inventoryItems.item_id),
+  quantity_required: decimal('quantity_required', { precision: 10, scale: 2 }),
+});
+
 export const inventoryTransactions = pgTable('inventory_transactions', {
   transaction_id: serial('transaction_id').primaryKey(),
   item_id: integer('item_id').references(() => inventoryItems.item_id),
@@ -90,6 +97,7 @@ export const productionListItems = pgTable('production_list_items', {
   production_list_id: integer('production_list_id')
     .references(() => productionLists.id)
     .notNull(),
+  original_required: integer('original_required').notNull().default(0),
   required: integer('required').notNull(),
   completed: integer('completed').default(0),
   took_from_stock: integer('took_from_stock').default(0),

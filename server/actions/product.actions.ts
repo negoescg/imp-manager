@@ -2,6 +2,7 @@
 import { db } from '@/lib/db';
 import { categories, finalProducts, productComposition } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
+import { getCategoryTemplate } from './category.actions';
 
 export const getProductComposition = async (id: number) => {
   const items = await db.select().from(productComposition).where(eq(productComposition.product_id, id));
@@ -35,6 +36,19 @@ export const addProduct = async (newItem) => {
       .values(newItem)
       .returning({ insertedId: finalProducts.product_id });
     newItem.product_id = addedItem[0].insertedId;
+
+    const templates = await getCategoryTemplate(newItem.category_id);
+
+    templates.forEach(async (element) => {
+      await db
+        .insert(productComposition)
+        .values({
+          product_id: addedItem[0].insertedId,
+          item_id: element.item_id,
+          quantity_required: element.quantity_required,
+        });
+    });
+
     return newItem;
   } catch (error) {
     console.error('Failed to add product:', error);

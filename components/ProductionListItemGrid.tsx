@@ -52,6 +52,7 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
       columnAutoWidth={true}
       onInitNewRow={(e) => {
         e.data.completed = 0;
+        e.data.took_from_stock = 0;
       }}
       searchPanel={{ visible: true, width: 240, placeholder: 'Search...' }}>
       <Editing
@@ -82,6 +83,7 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
         <RequiredRule />
       </Column>
       <Column dataField="completed" caption="Quantity Produced" dataType="number"></Column>
+      <Column dataField="took_from_stock" caption="Took from Stock" dataType="number"></Column>
     </DataGrid>
   );
 };

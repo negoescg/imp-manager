@@ -31,6 +31,14 @@ export const navLinks = [
   },
   {
     id: 3,
+    text: 'Categories',
+    icon: 'contentlayout',
+    href: '/category',
+    visible: false,
+    admin: true,
+  },
+  {
+    id: 4,
     text: 'Production Lists',
     icon: 'bulletlist',
     href: '/production',

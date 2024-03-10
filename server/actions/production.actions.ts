@@ -126,6 +126,7 @@ export const completeProductionList = async (id: number) => {
 export const addProductionListItem = async (newItem, listId) => {
   try {
     newItem.production_list_id = listId;
+    newItem.original_required = newItem.required;
     const addedItem = await db
       .insert(productionListItems)
       .values(newItem)
@@ -159,6 +160,7 @@ export const uploadProductionList = async (name: string, date: Date, items: stri
       listItems.push({
         sku: element.SKU,
         required: element.RequiredByBackOrder,
+        original_required: element.RequiredByBackOrder,
         production_list_id: listId[0].insertedId,
         completed: 0,
         name: element.Name,

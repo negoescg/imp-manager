@@ -1,0 +1,2 @@
+ALTER TABLE "inventory_transactions" ALTER COLUMN "expected_date" SET DEFAULT '2024-03-17 21:25:21.271';--> statement-breakpoint
+ALTER TABLE "production_list_items" ADD COLUMN "original_required" integer DEFAULT 0 NOT NULL;

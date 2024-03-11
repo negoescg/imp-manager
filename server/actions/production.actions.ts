@@ -6,6 +6,7 @@ import {
   inventoryTransactions,
   productComposition,
   productionListItems,
+  productionListOrphans,
   productionLists,
 } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
@@ -114,8 +115,14 @@ export const completeProductionList = async (id: number) => {
           }
         });
       }
+    } else {
+      await db.insert(productionListOrphans).values(element);
     }
   });
+  if (list) {
+    list.status = 'Completed';
+    await db.update(productionLists).set(list).where(eq(productionLists.id, id));
+  }
   try {
   } catch (error) {
     console.error('Failed to complete production list:', error);

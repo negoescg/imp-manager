@@ -103,6 +103,19 @@ export const productionListItems = pgTable('production_list_items', {
   took_from_stock: integer('took_from_stock').default(0),
 });
 
+export const productionListOrphans = pgTable('production_list_orphans', {
+  id: serial('id').primaryKey(),
+  sku: varchar('sku', { length: 255 }).notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  production_list_id: integer('production_list_id')
+    .references(() => productionLists.id)
+    .notNull(),
+  original_required: integer('original_required').notNull().default(0),
+  required: integer('required').notNull(),
+  completed: integer('completed').default(0),
+  took_from_stock: integer('took_from_stock').default(0),
+});
+
 export const inventoryItemsRelations = relations(inventoryItems, ({ one, many }) => ({
   itemType: one(itemTypes, {
     fields: [inventoryItems.item_type_id],

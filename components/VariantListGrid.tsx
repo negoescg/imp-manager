@@ -31,6 +31,7 @@ const VariantListGrid = ({ listId, variants }: Props) => {
         useIcons={true}
         newRowPosition="first"
       />
+      <Column dataField="sku" caption="SKU" allowEditing={false} />
       <Column dataField="description" caption="Description" allowEditing={false} />
       <Column dataField="required" caption="Required" dataType="number" />
       <Column dataField="completed" caption="Completed" dataType="number" />

@@ -35,43 +35,35 @@ const BathProductsGrid = ({ id, products }: Props) => {
           switch (description) {
             case 'Ring Size L/M':
               variantQuantities.L_M += required;
-              variantQuantities.sku = sku ?? '';
               variantQuantities.type = type ?? '';
               break;
             case 'Ring Size N/O':
               variantQuantities.N_O += required;
-              variantQuantities.sku = sku ?? '';
               variantQuantities.type = type ?? '';
               break;
             case 'Ring Size P/Q':
               variantQuantities.P_Q += required;
-              variantQuantities.sku = sku ?? '';
               variantQuantities.type = type ?? '';
               break;
             case 'Ring Size R/S':
               variantQuantities.R_S += required;
-              variantQuantities.sku = sku ?? '';
               variantQuantities.type = type ?? '';
               break;
             case 'Necklace':
               variantQuantities.NK += required;
-              variantQuantities.sku = sku ?? '';
               variantQuantities.type = type ?? '';
               break;
             case 'Earrings':
               variantQuantities.ER += required;
-              variantQuantities.sku = sku ?? '';
               variantQuantities.type = type ?? '';
               break;
             case 'No Jewel':
               variantQuantities.no_jewel += required;
-              variantQuantities.sku = sku ?? '';
               variantQuantities.type = type ?? '';
               break;
             default:
               if (variant.isBespoke) {
                 variantQuantities.kids += required;
-                variantQuantities.sku = sku ?? '';
                 variantQuantities.type = type ?? '';
               }
               break;

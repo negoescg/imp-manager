@@ -40,13 +40,11 @@ export const addProduct = async (newItem) => {
     const templates = await getCategoryTemplate(newItem.category_id);
 
     templates.forEach(async (element) => {
-      await db
-        .insert(productComposition)
-        .values({
-          product_id: addedItem[0].insertedId,
-          item_id: element.item_id,
-          quantity_required: element.quantity_required,
-        });
+      await db.insert(productComposition).values({
+        product_id: addedItem[0].insertedId,
+        item_id: element.item_id,
+        quantity_required: element.quantity_required,
+      });
     });
 
     return newItem;
@@ -90,6 +88,25 @@ export const addProductComposition = async (newItem, productId) => {
 export const updateProductComposition = async (itemId: number, updatedItem) => {
   try {
     await db.update(productComposition).set(updatedItem).where(eq(productComposition.composition_id, itemId));
+  } catch (error) {
+    console.error('Failed to update product:', error);
+    throw new Error('Failed to update product.');
+  }
+};
+
+export const uploadProductList = async (items: string) => {
+  try {
+    const fileDataArray = JSON.parse(items);
+    const listItems = [] as any[];
+    fileDataArray.forEach((element) => {
+      listItems.push({
+        sku: element.SKU,
+        required: element.RequiredByBackOrder,
+        original_required: element.RequiredByBackOrder,
+        completed: 0,
+        name: element.Name,
+      });
+    });
   } catch (error) {
     console.error('Failed to update product:', error);
     throw new Error('Failed to update product.');

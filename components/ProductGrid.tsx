@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import DataGrid, {
   Column,
   Paging,
@@ -21,10 +21,33 @@ import {
   getCategories,
   getFinalProducts,
   updateProduct,
+  uploadProductList,
 } from '@/server/actions/product.actions';
 import ProductCompositionGrid from './ProductCompositionGrid';
+import { Button as NormalButton, FileUploader, Toast } from 'devextreme-react';
+import * as XLSX from 'xlsx';
+import { useUser } from '@clerk/nextjs';
+import DataSource from 'devextreme/data/data_source';
 
 const ProductGrid = () => {
+  const { user, isLoaded } = useUser();
+  const fileUploaderRef = useRef<FileUploader>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [fileData, setFileData] = useState<any[]>([]);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const listsDataGridRef = useRef<DataGrid>(null);
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      if (user.organizationMemberships.length > 0) {
+        if (user.organizationMemberships[0].role === 'org:admin') {
+          setIsAdmin(true);
+        }
+      }
+    }
+  }, [user, isLoaded]);
+
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['product'],
     queryFn: async () => getFinalProducts(),
@@ -35,15 +58,48 @@ const ProductGrid = () => {
     queryFn: async () => getCategories(),
   });
 
-  const [productData] = useState(
-    new CustomStore({
+  const initialDataSource = new DataSource({
+    store: new CustomStore({
       key: 'product_id',
       load: async () => data ?? [],
       insert: async (values) => addProduct(values).finally(refetch),
       update: async (key, values) => updateProduct(key, values).finally(refetch),
       remove: async (key) => deleteProduct(key).finally(refetch),
     }),
-  );
+  });
+
+  const [dataSource, setDataSource] = useState(initialDataSource);
+  useEffect(() => {
+    if (listsDataGridRef.current) {
+      setDataSource(initialDataSource);
+    }
+  }, [data]);
+
+  const submitForm = async () => {
+    if (fileData.length) {
+      await uploadProductList(JSON.stringify(fileData));
+      refetch();
+      if (fileUploaderRef.current) {
+        fileUploaderRef.current.instance.reset();
+      }
+    } else {
+      setToastMessage('No file selected/wrong fromat/no data - Please check file.');
+      setToastVisible(true);
+      return;
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    if (e.value.length) {
+      const file = e.value[0];
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const worksheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[worksheetName];
+      const json = XLSX.utils.sheet_to_json(worksheet);
+      setFileData(json);
+    }
+  };
 
   const handleUniqueSkuValidation = (options) => {
     const itemId = options.data?.product_id ?? 0;
@@ -65,65 +121,89 @@ const ProductGrid = () => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading products</div>;
   return (
-    <DataGrid
-      dataSource={productData}
-      keyExpr="product_id"
-      onSelectionChanged={onSelectionChanged}
-      showColumnLines={true}
-      showRowLines={true}
-      showBorders={true}
-      rowAlternationEnabled={true}
-      columnAutoWidth={true}
-      searchPanel={{ visible: true, width: 240, placeholder: 'Search...' }}>
-      <Editing
-        refreshMode="reshape"
-        mode="row"
-        allowUpdating={true}
-        allowAdding={true}
-        allowDeleting={true}
-        useIcons={true}
-        newRowPosition="first"
-      />
-      <Paging enabled={true} defaultPageSize={10} />
-      <Pager
-        visible={true}
-        showPageSizeSelector={true}
-        allowedPageSizes={[10, 15, 20]}
-        showNavigationButtons={true}
-        showInfo={true}
-      />
-      <Column dataField="sku" caption="SKU">
-        <RequiredRule />
-        <CustomRule validationCallback={handleUniqueSkuValidation} message="SKU must be unique" />
-      </Column>
-      <Column dataField="name" caption="Name" />
-      <Column dataField="category_id" caption="Product Category">
-        <RequiredRule message="Product Category is required" />
-        <Lookup
-          dataSource={categories?.map((um) => ({ category_id: um.category_id, text: um.category_name }))}
-          valueExpr="category_id"
-          displayExpr="text"
+    <>
+      {isAdmin && (
+        <div className="flex items-center w-full">
+          <FileUploader
+            className=" w-56"
+            ref={fileUploaderRef}
+            onValueChanged={handleFileUpload}
+            selectButtonText="Select Excel file"
+            labelText=""
+            accept=".xlsx"
+            uploadMode="useForm"
+          />
+          <NormalButton text="Upload" type="default" onClick={submitForm} />
+        </div>
+      )}
+      <DataGrid
+        ref={listsDataGridRef}
+        dataSource={dataSource}
+        keyExpr="product_id"
+        onSelectionChanged={onSelectionChanged}
+        showColumnLines={true}
+        showRowLines={true}
+        showBorders={true}
+        rowAlternationEnabled={true}
+        columnAutoWidth={true}
+        searchPanel={{ visible: true, width: 240, placeholder: 'Search...' }}>
+        <Editing
+          refreshMode="reshape"
+          mode="row"
+          allowUpdating={true}
+          allowAdding={true}
+          allowDeleting={true}
+          useIcons={true}
+          newRowPosition="first"
         />
-      </Column>
-      <Column
-        dataField="product_id"
-        caption="Action"
-        allowEditing={false}
-        cellRender={(cellData) => {
-          if (!cellData.value) {
-            return <span></span>;
-          } else {
-            return (
-              <Link href={`/product/${cellData.value}`} title="composition">
-                Composition
-              </Link>
-            );
-          }
-        }}
+        <Paging enabled={true} defaultPageSize={10} />
+        <Pager
+          visible={true}
+          showPageSizeSelector={true}
+          allowedPageSizes={[10, 15, 20]}
+          showNavigationButtons={true}
+          showInfo={true}
+        />
+        <Column dataField="sku" caption="SKU">
+          <RequiredRule />
+          <CustomRule validationCallback={handleUniqueSkuValidation} message="SKU must be unique" />
+        </Column>
+        <Column dataField="name" caption="Name" />
+        <Column dataField="category_id" caption="Product Category">
+          <RequiredRule message="Product Category is required" />
+          <Lookup
+            dataSource={categories?.map((um) => ({ category_id: um.category_id, text: um.category_name }))}
+            valueExpr="category_id"
+            displayExpr="text"
+          />
+        </Column>
+        <Column
+          dataField="product_id"
+          caption="Action"
+          allowEditing={false}
+          cellRender={(cellData) => {
+            if (!cellData.value) {
+              return <span></span>;
+            } else {
+              return (
+                <Link href={`/product/${cellData.value}`} title="composition">
+                  Composition
+                </Link>
+              );
+            }
+          }}
+        />
+        <Selection mode="single" />
+        <MasterDetail enabled={false} render={renderDetail} />
+      </DataGrid>
+      <Toast
+        visible={toastVisible}
+        message={toastMessage}
+        type="error"
+        displayTime={3000}
+        onHiding={() => setToastVisible(false)}
       />
-      <Selection mode="single" />
-      <MasterDetail enabled={false} render={renderDetail} />
-    </DataGrid>
+    </>
   );
 };
 

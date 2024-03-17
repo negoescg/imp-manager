@@ -30,6 +30,7 @@ const ProductionListGrid = () => {
   const [listDate, setListDate] = useState(new Date());
   const fileUploaderRef = useRef<FileUploader>(null);
   const listsDataGridRef = useRef<DataGrid>(null);
+
   useEffect(() => {
     if (isLoaded && user) {
       if (user.organizationMemberships.length > 0) {
@@ -90,12 +91,15 @@ const ProductionListGrid = () => {
       setFileData(json);
     }
   };
+
   const completeList = async (data) => {
     await completeProductionList(data.id);
     refetch();
   };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading products</div>;
+
   return (
     <>
       {isAdmin && (

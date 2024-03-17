@@ -211,3 +211,21 @@ export const updateInventoryItemTransaction = async (itemId: number, updatedItem
     throw new Error('Failed to update inventory item.');
   }
 };
+
+export const uploadInventoryList = async (items: string) => {
+  try {
+    const fileDataArray = JSON.parse(items);
+    const listItems = [] as any[];
+    fileDataArray.forEach((element) => {
+      listItems.push({
+        item_sku: element.Sku,
+        name: element.Name,
+        item_type_id: element.Type,
+        unit_of_measure_id: element.Unit,
+      });
+    });
+  } catch (error) {
+    console.error('Failed to upload inventory list:', error);
+    throw new Error('Failed to upload inventory list.');
+  }
+};

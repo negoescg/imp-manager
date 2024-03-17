@@ -226,7 +226,6 @@ const ProductionView = ({ itemId, data }: Props) => {
     if (data) {
       const processedData = processItems(data);
       setCategorizedData(processedData);
-      console.log(processedData);
     }
   }, [data]);
 

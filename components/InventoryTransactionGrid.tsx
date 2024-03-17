@@ -159,7 +159,7 @@ const InventoryTransactionGrid = ({ itemId }: Props) => {
           icon="todo"
           hint="Confirm Transaction"
           visible={(options) => {
-            return options.row.data.status === 'Pending';
+            return options.row.data.status === 'Pending' && !options.row.isNewRow;
           }}
           onClick={(e) => {
             confirm('Are you sure you want to confirm this transaction?', 'Confirm Transaction').then(
@@ -174,10 +174,15 @@ const InventoryTransactionGrid = ({ itemId }: Props) => {
         <Button
           name="edit"
           visible={(options) => {
-            return options.row.data.status === 'Pending';
+            return options.row.data.status === 'Pending' && !options.row.isNewRow;
           }}
         />
-        <Button name="delete" />
+        <Button
+          name="delete"
+          visible={(options) => {
+            return !options.row.isNewRow;
+          }}
+        />
       </Column>
       <Summary calculateCustomSummary={calculateConfirmedQuantity}>
         <TotalItem

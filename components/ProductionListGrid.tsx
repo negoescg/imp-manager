@@ -64,7 +64,6 @@ const ProductionListGrid = () => {
   }, [data]);
 
   const submitForm = async () => {
-    console.log('Submitting form with: ', { name, listDate });
     if (fileData.length) {
       await uploadProductionList(name, listDate, JSON.stringify(fileData));
       refetch();
@@ -199,7 +198,7 @@ const ProductionListGrid = () => {
             icon="todo"
             hint="Complete List"
             visible={(options) => {
-              return options.row.data.status === 'In Progress';
+              return options.row.data.status === 'In Progress' && !options.row.isNewRow;
             }}
             onClick={(e: DataGridTypes.ColumnButtonClickEvent) => {
               confirm('Are you sure you want to mark this list as completed?', 'Complete List').then((dialogResult) => {
@@ -212,10 +211,15 @@ const ProductionListGrid = () => {
           <Button
             name="edit"
             visible={(options) => {
-              return options.row.data.status === 'In Progress';
+              return options.row.data.status === 'In Progress' && !options.row.isNewRow;
             }}
           />
-          <Button name="delete" />
+          <Button
+            name="delete"
+            visible={(options) => {
+              return !options.row.isNewRow;
+            }}
+          />
         </Column>
       </DataGrid>
       <Toast

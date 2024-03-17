@@ -110,14 +110,17 @@ const ProductGrid = () => {
 
     return !data?.some((item) => item.product_id !== itemId && item.sku === options.value);
   };
+
   const renderDetail = (props: DataGridTypes.MasterDetailTemplateData) => {
     const { product_id } = props.data;
     return <ProductCompositionGrid itemId={product_id} />;
   };
+
   const onSelectionChanged = (e: DataGridTypes.SelectionChangedEvent) => {
     e.component.collapseAll(-1);
     e.component.expandRow(e.currentSelectedRowKeys[0]);
   };
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading products</div>;
   return (

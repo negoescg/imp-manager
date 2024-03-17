@@ -152,7 +152,6 @@ const InventoryGrid = () => {
           e.data.date_created = new Date();
         }}
         onRowValidating={(e) => {
-          console.log('validating', e);
           if (e.newData.item_type_id === 2 && (!e.newData.item_sku || e.newData.item_sku.trim() === '')) {
             e.isValid = false;
             e.errorText = 'SKU is required for this item type.';

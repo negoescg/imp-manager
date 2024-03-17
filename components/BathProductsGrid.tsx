@@ -96,7 +96,6 @@ const BathProductsGrid = ({ id, products }: Props) => {
   const dataSource = processData(products);
 
   const renderDetail = (props: DataGridTypes.MasterDetailTemplateData) => {
-    console.warn(props);
     return <VariantListGrid variants={props.data.Variants} listId={id} />;
   };
 

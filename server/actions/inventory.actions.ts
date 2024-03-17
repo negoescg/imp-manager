@@ -77,7 +77,6 @@ export const updateInventoryItem = async (itemId: number, updatedItem) => {
 
 export const getInventoryItemTransactions = async (id: number) => {
   const items = await db.select().from(inventoryTransactions).where(eq(inventoryTransactions.item_id, id));
-  console.log(items);
   return items;
 };
 

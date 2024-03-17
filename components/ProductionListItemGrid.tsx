@@ -12,6 +12,7 @@ import {
 } from '@/server/actions/production.actions';
 import ProductionView from './ProductionView';
 import { Switch } from 'devextreme-react';
+import ProductAutocompleteEditor from './ProductAutocompleteEditor';
 
 type Props = {
   itemId: number;
@@ -35,7 +36,6 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
   );
   const handleUniqueSkuValidation = (options) => {
     const itemId = options.data?.id ?? 0;
-    console.log(itemId, options.value, data);
     if (itemId === 0 || !itemId) {
       return !data?.some((item) => item.sku === options.value);
     }
@@ -87,7 +87,7 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
             <RequiredRule />
             <CustomRule validationCallback={handleUniqueSkuValidation} message="SKU must be unique" />
           </Column>
-          <Column dataField="name" caption="Name">
+          <Column dataField="name" caption="Name" editCellComponent={ProductAutocompleteEditor}>
             <RequiredRule />
           </Column>
           <Column dataField="required" caption="Quantity Required" dataType="number">

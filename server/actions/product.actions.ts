@@ -11,6 +11,7 @@ export const getProductComposition = async (id: number) => {
 
 export const getFinalProducts = async () => {
   const items = await db.select().from(finalProducts);
+  console.log('test 11');
   return items;
 };
 

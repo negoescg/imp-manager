@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import DataGrid, { Column, Paging, Pager, Editing, Lookup, RequiredRule } from 'devextreme-react/data-grid';
+import DataGrid, { Column, Paging, Pager, Editing, Lookup, RequiredRule, CustomRule } from 'devextreme-react/data-grid';
 import { useQuery } from '@tanstack/react-query';
 import { getInventoryItems } from '@/server/actions/inventory.actions';
 import CustomStore from 'devextreme/data/custom_store';
@@ -25,6 +25,16 @@ const ProductCompositionGrid = ({ itemId }: Props) => {
     queryKey: ['inventory'],
     queryFn: async () => getInventoryItems(),
   });
+
+  const handleUniqueMaterialValidation = (options) => {
+    const itemId = options.data?.composition_id ?? 0;
+
+    if (itemId === 0 || !itemId) {
+      return !data?.some((item) => item.item_id === options.value);
+    }
+
+    return !data?.some((item) => item.composition_id !== itemId && item.item_id === options.value);
+  };
 
   const [compositionData, setCompositionData] = useState(new CustomStore());
   useEffect(() => {
@@ -70,6 +80,10 @@ const ProductCompositionGrid = ({ itemId }: Props) => {
       />
       <Column dataField="item_id" caption="Material">
         <RequiredRule message="Material is required" />
+        <CustomRule
+          validationCallback={handleUniqueMaterialValidation}
+          message="Material already added to composition"
+        />
         <Lookup
           dataSource={inventoryItems?.map((um) => ({
             item_id: um.item_id,

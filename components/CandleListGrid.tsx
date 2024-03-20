@@ -8,10 +8,11 @@ import ProdViewQuantityCell from './ProdViewQuantityCell';
 
 type Props = {
   id: number;
+  refetch: () => void;
   products: ProductDetail[];
 };
 
-const CandleListGrid = ({ id, products }: Props) => {
+const CandleListGrid = ({ id, products, refetch }: Props) => {
   const processData = (products: ProductDetail[]) => {
     return products.map((product) => {
       const variantQuantities = {
@@ -126,7 +127,7 @@ const CandleListGrid = ({ id, products }: Props) => {
   const dataSource = processData(products);
 
   const renderDetail = (props: DataGridTypes.MasterDetailTemplateData) => {
-    return <VariantListGrid variants={props.data.Variants} listId={id} />;
+    return <VariantListGrid variants={props.data.Variants} listId={id} refetch={refetch} />;
   };
 
   const onRowClick = (e: DataGridTypes.RowClickEvent<any, any>) => {
@@ -281,8 +282,8 @@ const CandleListGrid = ({ id, products }: Props) => {
       showRowLines={true}
       onRowClick={onRowClick}
       rowAlternationEnabled={true}>
-      <Column dataField="sku" caption="SKU" />
-      <Column dataField="name" caption="Name" />
+      {/* <Column dataField="sku" caption="SKU" /> */}
+      <Column dataField="name" width="20%" caption="Name" />
       {/* <Column dataField="type" caption="Type" /> */}
       <Column cellRender={ProdViewQuantityCell} dataField="L_M" caption="L/M" />
       <Column cellRender={ProdViewQuantityCell} dataField="N_O" caption="N/O" />
@@ -293,7 +294,7 @@ const CandleListGrid = ({ id, products }: Props) => {
       <Column cellRender={ProdViewQuantityCell} dataField="BR" caption="BR" />
       <Column cellRender={ProdViewQuantityCell} dataField="PIN" caption="PIN" />
       <Column cellRender={ProdViewQuantityCell} dataField="CUSTOM" caption="CUSTOM" />
-      <Column dataField="TOTAL" caption="Total" />
+      <Column dataField="TOTAL" caption="Total" width="105px" />
       <Summary calculateCustomSummary={calculateTotals}>
         <TotalItem summaryType="custom" showInColumn="L_M" displayFormat="{0}" name="L_M" />
         <TotalItem summaryType="custom" showInColumn="N_O" displayFormat="{0}" name="N_O" />

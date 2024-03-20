@@ -6,6 +6,7 @@ import BathProductsGrid from './BathProductsGrid';
 import { CategoryDetail } from '@/interfaces/list.interfaces';
 type Props = {
   itemId: number;
+  refetch: () => void;
   data:
     | {
         id: number;
@@ -219,7 +220,7 @@ const processItems = (
   return categories;
 };
 
-const ProductionView = ({ itemId, data }: Props) => {
+const ProductionView = ({ itemId, data, refetch }: Props) => {
   const [categorizedData, setCategorizedData] = useState<CategoryDetail>({});
 
   useEffect(() => {
@@ -265,11 +266,11 @@ const ProductionView = ({ itemId, data }: Props) => {
       itemComponent={({ data }) => {
         switch (data.title) {
           case 'Candle List':
-            return <CandleListGrid products={data.tableData} id={itemId} />;
+            return <CandleListGrid products={data.tableData} id={itemId} refetch={refetch} />;
           case 'Bath Products':
-            return <BathProductsGrid products={data.tableData} id={itemId} />;
+            return <BathProductsGrid products={data.tableData} id={itemId} refetch={refetch} />;
           case 'Other':
-            return <OtherListGrid products={data.tableData} id={itemId} />;
+            return <OtherListGrid products={data.tableData} id={itemId} refetch={refetch} />;
           default:
             return <></>;
         }

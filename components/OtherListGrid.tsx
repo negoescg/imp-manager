@@ -9,10 +9,11 @@ import { updateProductionListItem } from '@/server/actions/production.actions';
 
 type Props = {
   id: number;
+  refetch: () => void;
   products: ProductDetail[];
 };
 
-const OtherListGrid = ({ id, products }: Props) => {
+const OtherListGrid = ({ id, products, refetch }: Props) => {
   const processData = (products: ProductDetail[]) => {
     return products.map((product) => {
       const variantQuantities = {

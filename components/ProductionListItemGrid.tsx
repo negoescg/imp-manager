@@ -34,6 +34,9 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
       remove: async (key) => deleteProductionListItem(key).finally(refetch),
     }),
   );
+  const handleRefetch = () => {
+    refetch();
+  };
   const handleUniqueSkuValidation = (options) => {
     const itemId = options.data?.id ?? 0;
     if (itemId === 0 || !itemId) {
@@ -51,7 +54,7 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
         <Switch value={toggleView} onValueChange={(value) => setToggleView(value)} stylingMode="filled" />
       </div>
       {toggleView ? (
-        <ProductionView data={data} itemId={itemId} />
+        <ProductionView data={data} itemId={itemId} refetch={handleRefetch} />
       ) : (
         <DataGrid
           dataSource={listItems}

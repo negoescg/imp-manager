@@ -8,10 +8,11 @@ import ProdViewQuantityCell from './ProdViewQuantityCell';
 
 type Props = {
   id: number;
+  refetch: () => void;
   products: ProductDetail[];
 };
 
-const BathProductsGrid = ({ id, products }: Props) => {
+const BathProductsGrid = ({ id, products, refetch }: Props) => {
   const processData = (products: ProductDetail[]) => {
     return products.map((product) => {
       const variantQuantities = {
@@ -124,7 +125,7 @@ const BathProductsGrid = ({ id, products }: Props) => {
   const dataSource = processData(products);
 
   const renderDetail = (props: DataGridTypes.MasterDetailTemplateData) => {
-    return <VariantListGrid variants={props.data.Variants} listId={id} />;
+    return <VariantListGrid variants={props.data.Variants} listId={id} refetch={refetch} />;
   };
 
   const onRowClick = (e: DataGridTypes.RowClickEvent<any, any>) => {
@@ -267,8 +268,8 @@ const BathProductsGrid = ({ id, products }: Props) => {
       showRowLines={true}
       onRowClick={onRowClick}
       rowAlternationEnabled={true}>
-      <Column dataField="sku" caption="SKU" />
-      <Column dataField="name" caption="Name" />
+      {/* <Column dataField="sku" caption="SKU" /> */}
+      <Column dataField="name" caption="Name" width="18%" />
 
       <Column dataField="type" caption="Type" />
       <Column cellRender={ProdViewQuantityCell} dataField="no_jewel" caption="NO JEWEL" />
@@ -279,7 +280,7 @@ const BathProductsGrid = ({ id, products }: Props) => {
       <Column cellRender={ProdViewQuantityCell} dataField="NK" caption="NK" />
       <Column cellRender={ProdViewQuantityCell} dataField="ER" caption="ER" />
       <Column cellRender={ProdViewQuantityCell} dataField="kids" caption="KIDS" />
-      <Column dataField="TOTAL" caption="Total" />
+      <Column dataField="TOTAL" caption="Total" width="105px;" />
       <Summary calculateCustomSummary={calculateTotals}>
         <TotalItem summaryType="custom" showInColumn="L_M" displayFormat="{0}" name="L_M" />
         <TotalItem summaryType="custom" showInColumn="N_O" displayFormat="{0}" name="N_O" />

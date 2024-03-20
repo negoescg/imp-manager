@@ -139,7 +139,7 @@ const CandleListGrid = ({ id, products }: Props) => {
       rowAlternationEnabled={true}>
       <Column dataField="sku" caption="SKU" />
       <Column dataField="name" caption="Name" />
-      <Column dataField="type" caption="Type" />
+      {/* <Column dataField="type" caption="Type" /> */}
       <Column
         cellRender={(cellData) => (cellData.value === 0 ? <></> : <>{cellData.value}</>)}
         dataField="L_M"

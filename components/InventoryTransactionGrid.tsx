@@ -27,8 +27,9 @@ import StatusCell from './StatusCell';
 
 type Props = {
   itemId: number;
+  unit?: string | null;
 };
-const InventoryTransactionGrid = ({ itemId }: Props) => {
+const InventoryTransactionGrid = ({ itemId, unit }: Props) => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['inventoryTransaction', itemId],
     queryFn: async () => getInventoryItemTransactions(itemId),
@@ -127,7 +128,7 @@ const InventoryTransactionGrid = ({ itemId }: Props) => {
           displayExpr="text"
         />
       </Column>
-      <Column dataField="quantity" caption="Quantity" dataType="number">
+      <Column dataField="quantity" caption={`Quantity ${unit ? `(${unit})` : ''}`} dataType="number">
         <RequiredRule />
       </Column>
       <Column

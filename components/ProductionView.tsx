@@ -155,9 +155,9 @@ const processItems = (
     }
 
     if (hasVariant) {
-      let product = categories[category].find((p) => p.name === productBaseName);
+      let product = categories[category].find((p) => p.name === productBaseName && p.type === type);
       if (!product) {
-        product = { name: productBaseName, variants: [], isBespoke: isBespoke };
+        product = { name: productBaseName, variants: [], isBespoke: isBespoke, type: type };
         categories[category].push(product);
       }
       if (isBespoke) {

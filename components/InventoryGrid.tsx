@@ -79,8 +79,9 @@ const InventoryGrid = () => {
   };
 
   const renderDetail = (props: DataGridTypes.MasterDetailTemplateData) => {
-    const { item_id } = props.data;
-    return <InventoryTransactionGrid itemId={item_id} />;
+    const { item_id, unit_of_measure_id } = props.data;
+    const unit = unitOfMeasure?.find((x) => x.unit_id === unit_of_measure_id)?.unit_name;
+    return <InventoryTransactionGrid itemId={item_id} unit={unit} />;
   };
   const initialDataSource = new DataSource({
     store: new CustomStore({
@@ -188,6 +189,14 @@ const InventoryGrid = () => {
         {/* <Column dataField="item_description" caption="Description" /> */}
         <Column dataField="item_sku" caption="SKU"></Column>
         <Column dataField="quantity" caption="Quantity" allowEditing={false} />
+        <Column dataField="unit_of_measure_id" caption="Unit Of Measure">
+          <RequiredRule message="Unit of Measure is required" />
+          <Lookup
+            dataSource={unitOfMeasure?.map((um) => ({ unit_of_measure_id: um.unit_id, text: um.unit_name }))}
+            valueExpr="unit_of_measure_id"
+            displayExpr="text"
+          />
+        </Column>
         <Column
           dataField="date_created"
           caption="Date Created"
@@ -201,15 +210,6 @@ const InventoryGrid = () => {
           <Lookup
             dataSource={itemTypes?.map((it) => ({ item_type_id: it.type_id, text: it.type_name }))}
             valueExpr="item_type_id"
-            displayExpr="text"
-          />
-        </Column>
-
-        <Column dataField="unit_of_measure_id" caption="Unit Of Measure">
-          <RequiredRule message="Unit of Measure is required" />
-          <Lookup
-            dataSource={unitOfMeasure?.map((um) => ({ unit_of_measure_id: um.unit_id, text: um.unit_name }))}
-            valueExpr="unit_of_measure_id"
             displayExpr="text"
           />
         </Column>

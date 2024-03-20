@@ -238,7 +238,30 @@ const ProductionView = ({ itemId, data }: Props) => {
       }))}
       collapsible={true}
       multiple={false}
-      itemTitleRender={({ title }) => <h3>{title}</h3>}
+      itemTitleRender={({ title }) => {
+        switch (title) {
+          case 'Candle List':
+            return (
+              <div className="bg-purple-800 text-white w-full mr-5 px-2">
+                <h3>{title}</h3>
+              </div>
+            );
+          case 'Bath Products':
+            return (
+              <div className="bg-blue-800 text-white w-full mr-5 px-2">
+                <h3>{title}</h3>
+              </div>
+            );
+          case 'Other':
+            return (
+              <div className=" bg-gray-500 text-white w-full mr-5 px-2">
+                <h3>{title}</h3>
+              </div>
+            );
+          default:
+            return <></>;
+        }
+      }}
       itemComponent={({ data }) => {
         switch (data.title) {
           case 'Candle List':

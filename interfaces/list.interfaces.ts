@@ -23,3 +23,10 @@ export interface ProductDetail {
 export interface CategoryDetail {
   [categoryName: string]: ProductDetail[];
 }
+
+export interface VariantCell {
+  sku: string;
+  required: number;
+  completed: number;
+  stock: number;
+}

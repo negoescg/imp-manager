@@ -5,6 +5,9 @@ import { Workbook } from 'exceljs';
 import { saveAs } from 'file-saver-es';
 import { exportDataGrid } from 'devextreme/excel_exporter';
 import ProdViewQuantityCell from './ProdViewQuantityCell';
+import DataSource from 'devextreme/data/data_source';
+import CustomStore from 'devextreme/data/custom_store';
+import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   id: number;
@@ -13,6 +16,8 @@ type Props = {
 };
 
 const BathProductsGrid = ({ id, products, refetch }: Props) => {
+  const listsDataGridRef = useRef<DataGrid>(null);
+
   const processData = (products: ProductDetail[]) => {
     return products.map((product) => {
       const variantQuantities = {
@@ -122,10 +127,79 @@ const BathProductsGrid = ({ id, products, refetch }: Props) => {
     });
   };
 
-  const dataSource = processData(products);
+  const [data, setData] = useState(processData(products));
 
+  const initialDataSource = new DataSource({
+    store: new CustomStore({
+      load: async () => data ?? [],
+    }),
+  });
+
+  const [dataSource, setDataSource] = useState(initialDataSource);
+  useEffect(() => {
+    if (listsDataGridRef.current) {
+      setDataSource(
+        new DataSource({
+          store: new CustomStore({
+            load: async () => data ?? [],
+          }),
+        }),
+      );
+    }
+  }, [data]);
+
+  const handleUpdate = (variant: VariantDetail, values: any, name: string, type: string): void => {
+    const productIndex = data.findIndex((x) => x.name === name && x.type === type);
+    if (productIndex !== -1) {
+      const variantKey = getVariantKey(variant.description);
+      if (variantKey && data[productIndex][variantKey]) {
+        data[productIndex][variantKey] = {
+          ...data[productIndex][variantKey],
+          required: values?.required ?? variant.required,
+          completed: values?.completed ?? variant.completed,
+          stock: values?.took_from_stock ?? variant.took_from_stock,
+        };
+        setData([...data]);
+      }
+    }
+  };
+
+  const getVariantKey = (description: string): string => {
+    switch (description) {
+      case 'Ring Size L/M':
+        return 'L_M';
+      case 'Ring Size N/O':
+        return 'N_O';
+      case 'Ring Size P/Q':
+        return 'P_Q';
+      case 'Ring Size R/S':
+        return 'R_S';
+      case 'Necklace':
+        return 'NK';
+      case 'Earrings':
+        return 'ER';
+      case 'Bracelet':
+        return 'BR';
+      case 'Pin':
+        return 'PIN';
+      case 'Custom':
+        return 'CUSTOM';
+      case 'No Jewel':
+        return 'NJ';
+      default:
+        return 'kids';
+    }
+  };
   const renderDetail = (props: DataGridTypes.MasterDetailTemplateData) => {
-    return <VariantListGrid variants={props.data.Variants} listId={id} refetch={refetch} />;
+    return (
+      <VariantListGrid
+        variants={props.data.Variants}
+        listId={id}
+        name={props.data.name}
+        type={props.data.type}
+        refetch={handleUpdate}
+      />
+    );
   };
 
   const onRowClick = (e: DataGridTypes.RowClickEvent<any, any>) => {
@@ -262,6 +336,7 @@ const BathProductsGrid = ({ id, products, refetch }: Props) => {
   return (
     <DataGrid
       dataSource={dataSource}
+      ref={listsDataGridRef}
       onExporting={onExporting}
       showBorders={true}
       showColumnLines={true}

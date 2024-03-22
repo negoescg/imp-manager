@@ -4,14 +4,28 @@ import DataGrid, { Column, Editing } from 'devextreme-react/data-grid';
 import CustomStore from 'devextreme/data/custom_store';
 import { updateProductionListItem } from '@/server/actions/production.actions';
 
-type Props = { listId: number; variants: VariantDetail[]; refetch: () => void };
+type Props = {
+  listId: number;
+  variants: VariantDetail[];
+  name: string;
+  type: string;
+  refetch: (variant, values, name, type) => void;
+};
 
-const VariantListGrid = ({ listId, variants, refetch }: Props) => {
+const VariantListGrid = ({ listId, variants, refetch, name, type }: Props) => {
   const [variantStore] = useState(
     new CustomStore({
       key: 'id',
       load: async () => variants ?? [],
-      update: async (key, values) => updateProductionListItem(key, values).finally(() => console.warn('update')),
+      update: async (key, values) =>
+        updateProductionListItem(key, values).finally(() =>
+          refetch(
+            variants.find((x) => x.id == key),
+            values,
+            name,
+            type,
+          ),
+        ),
     }),
   );
   return (

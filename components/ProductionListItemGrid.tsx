@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import DataGrid, { Column, Paging, Pager, Editing, RequiredRule, CustomRule } from 'devextreme-react/data-grid';
 import { useQuery } from '@tanstack/react-query';
 import CustomStore from 'devextreme/data/custom_store';
@@ -25,18 +25,28 @@ const ProductionListItemGrid = ({ itemId }: Props) => {
     enabled: !!itemId,
   });
 
-  const [listItems] = useState(
-    new CustomStore({
-      key: 'id',
-      load: async () => data ?? [],
-      insert: async (values) => addProductionListItem(values, itemId).finally(refetch),
-      update: async (key, values) => updateProductionListItem(key, values).finally(refetch),
-      remove: async (key) => deleteProductionListItem(key).finally(refetch),
-    }),
-  );
+  const initialStore = new CustomStore({
+    key: 'id',
+    load: async () => data ?? [],
+    insert: async (values) => addProductionListItem(values, itemId).finally(refetch),
+    update: async (key, values) => updateProductionListItem(key, values).finally(refetch),
+    remove: async (key) => deleteProductionListItem(key).finally(refetch),
+  });
+
+  const [listItems, setListItems] = useState(initialStore);
+
   const handleRefetch = () => {
     refetch();
   };
+
+  useEffect(() => {
+    if (data) setListItems(initialStore);
+  }, [data]);
+
+  useEffect(() => {
+    if (!toggleView) refetch();
+  }, [toggleView]);
+
   const handleUniqueSkuValidation = (options) => {
     const itemId = options.data?.id ?? 0;
     if (itemId === 0 || !itemId) {

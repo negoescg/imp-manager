@@ -100,13 +100,20 @@ export const completeProductionList = async (id: number) => {
             where: eq(inventoryItems.item_id, composition.item_id as number),
           });
           if (inventory && composition.item_id && element.completed && element.completed > 0) {
+            const isKg = inventory.unit_of_measure_id === 3;
             const newTransaction = {
               item_id: inventory.item_id,
               date_of_transaction: new Date(),
               expected_date: new Date(),
               status: 'Confirmed',
               transaction_type_id: 2,
-              quantity: element.completed * parseFloat(composition.quantity_required ?? '0'),
+              quantity:
+                element.completed *
+                parseFloat(
+                  isKg
+                    ? (parseFloat(composition.quantity_required ?? '0') / 1000).toFixed(3)
+                    : composition.quantity_required ?? '0',
+                ),
             } as Transaction;
 
             await db.insert(inventoryTransactions).values(newTransaction);

@@ -3,6 +3,7 @@
 import { db } from '@/lib/db';
 import { inventoryItems, inventoryTransactions } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
+import { updateAllProductCosts } from './cost.actions';
 
 export const getInventoryItems = async () => {
   const items = await db.query.inventoryItems.findMany();
@@ -88,14 +89,19 @@ export const deleteInventoryItemTransaction = async (itemId: number, inventoryIt
     const inventoryItem = await db.query.inventoryItems.findFirst({
       where: eq(inventoryItems.item_id, inventoryItemId),
     });
-    if (inventoryItemTransaction && inventoryItemTransaction.transaction_type_id === 1 && inventoryItem) {
-      inventoryItem.quantity = (inventoryItem.quantity ?? 0) - (inventoryItemTransaction.quantity ?? 0);
-      await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
-    } else if (inventoryItemTransaction && inventoryItemTransaction.transaction_type_id === 2 && inventoryItem) {
-      inventoryItem.quantity = (inventoryItem.quantity ?? 0) + (inventoryItemTransaction.quantity ?? 0);
-      await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
+    if (inventoryItemTransaction && inventoryItemTransaction.status !== 'Pending') {
+      if (inventoryItemTransaction && inventoryItemTransaction.transaction_type_id === 1 && inventoryItem) {
+        inventoryItem.quantity = (inventoryItem.quantity ?? 0) - (inventoryItemTransaction.quantity ?? 0);
+        await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
+      } else if (inventoryItemTransaction && inventoryItemTransaction.transaction_type_id === 2 && inventoryItem) {
+        inventoryItem.quantity = (inventoryItem.quantity ?? 0) + (inventoryItemTransaction.quantity ?? 0);
+        await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
+      }
     }
     await db.delete(inventoryTransactions).where(eq(inventoryTransactions.transaction_id, itemId));
+
+    if (inventoryItemTransaction && inventoryItemTransaction.status !== 'Pending')
+      await updateAllProductCosts(inventoryItemId as number);
   } catch (error) {
     console.error('Failed to delete inventory item:', error);
     throw new Error('Failed to delete inventory item.');
@@ -123,6 +129,7 @@ export const addInventoryItemTransaction = async (newItem, id: number) => {
         inventoryItem.quantity = (inventoryItem.quantity ?? 0) - newItem.quantity;
         await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
       }
+      await updateAllProductCosts(id as number);
     }
     return newItem;
   } catch (error) {
@@ -142,6 +149,7 @@ export const confirmInventoryTransaction = async (id: number) => {
     if (transactionItem) {
       transactionItem.status = 'Confirmed';
       await db.update(inventoryTransactions).set(transactionItem).where(eq(inventoryTransactions.transaction_id, id));
+      await updateAllProductCosts(transactionItem.item_id as number);
     }
     if (transactionItem && transactionItem.transaction_type_id === 1 && inventoryItem) {
       inventoryItem.quantity = (inventoryItem.quantity ?? 0) + (transactionItem.quantity ?? 0);
@@ -201,10 +209,13 @@ export const updateInventoryItemTransaction = async (itemId: number, updatedItem
           inventoryItem.quantity = (inventoryItem.quantity ?? 0) - (updatedItem.quantity ?? 0);
         }
       }
-      if (inventoryItem)
+      if (inventoryItem) {
         await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
+      }
     }
     await db.update(inventoryTransactions).set(updatedItem).where(eq(inventoryTransactions.transaction_id, itemId));
+    if (inventoryItemTransaction && inventoryItemTransaction.status !== 'Pending' && updatedItem?.quantity)
+      await updateAllProductCosts(inventoryItemId as number);
   } catch (error) {
     console.error('Failed to update inventory item:', error);
     throw new Error('Failed to update inventory item.');

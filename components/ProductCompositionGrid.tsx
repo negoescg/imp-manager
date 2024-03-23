@@ -43,8 +43,8 @@ const ProductCompositionGrid = ({ itemId }: Props) => {
         key: 'composition_id',
         load: async () => data ?? [],
         insert: async (values) => addProductComposition(values, itemId).finally(refetch),
-        update: async (key, values) => updateProductComposition(key, values).finally(refetch),
-        remove: async (key) => deleteProductComposition(key).finally(refetch),
+        update: async (key, values) => updateProductComposition(key, values, itemId).finally(refetch),
+        remove: async (key) => deleteProductComposition(key, itemId).finally(refetch),
       }),
     );
   }, [data]);

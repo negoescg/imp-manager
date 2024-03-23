@@ -171,7 +171,9 @@ const ProductGrid = () => {
           <RequiredRule />
           <CustomRule validationCallback={handleUniqueSkuValidation} message="SKU must be unique" />
         </Column>
-        <Column dataField="name" caption="Name" />
+        <Column dataField="name" caption="Name">
+          <RequiredRule />
+        </Column>
         <Column dataField="category_id" caption="Product Category">
           <RequiredRule message="Product Category is required" />
           <Lookup
@@ -180,6 +182,40 @@ const ProductGrid = () => {
             displayExpr="text"
           />
         </Column>
+        <Column
+          dataField="production_cost"
+          caption="Prod. Cost"
+          dataType="number"
+          format={{ type: 'currency', currency: 'GBP', precision: 2 }}
+        />
+        <Column
+          dataField="production_cost_difference"
+          caption="Cost Variation"
+          allowEditing={false}
+          cellRender={({ value }) => {
+            if (value > 0) {
+              return (
+                <div style={{ color: 'red' }}>
+                  <span style={{ marginRight: '5px' }}>↑</span>
+                  {value.toLocaleString('en-GB', { style: 'currency', currency: 'GBP', minimumFractionDigits: 2 })}
+                </div>
+              );
+            } else if (value < 0) {
+              return (
+                <div style={{ color: 'green' }}>
+                  <span style={{ marginRight: '5px' }}>↓</span>
+                  {Math.abs(value).toLocaleString('en-GB', {
+                    style: 'currency',
+                    currency: 'GBP',
+                    minimumFractionDigits: 2,
+                  })}
+                </div>
+              );
+            } else {
+              return <span>No Change</span>;
+            }
+          }}
+        />
         <Column
           dataField="product_id"
           caption="Action"

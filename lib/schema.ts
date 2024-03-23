@@ -47,6 +47,7 @@ export const finalProducts = pgTable('final_products', {
   category_id: integer('category_id').references(() => categories.category_id),
   production_cost: decimal('production_cost', { precision: 10, scale: 2 }),
   price: decimal('price', { precision: 10, scale: 2 }),
+  production_cost_difference: decimal('production_cost_difference', { precision: 10, scale: 2 }),
 });
 
 export const productComposition = pgTable('product_composition', {

@@ -1,0 +1,2 @@
+ALTER TABLE "final_products" ALTER COLUMN "production_cost_difference" DROP DEFAULT;--> statement-breakpoint
+ALTER TABLE "inventory_transactions" ALTER COLUMN "expected_date" SET DEFAULT '2024-03-30 12:26:11.715';

@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { categories, finalProducts, productComposition } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
 import { getCategoryTemplate } from './category.actions';
+import { updateProductCost } from './cost.actions';
 
 export const getProductComposition = async (id: number) => {
   const items = await db.select().from(productComposition).where(eq(productComposition.product_id, id));
@@ -11,7 +12,6 @@ export const getProductComposition = async (id: number) => {
 
 export const getFinalProducts = async () => {
   const items = await db.select().from(finalProducts);
-  console.log('test 11');
   return items;
 };
 
@@ -48,6 +48,9 @@ export const addProduct = async (newItem) => {
       });
     });
 
+    const cost = await updateProductCost(addedItem[0].insertedId);
+    newItem.production_cost = cost.newCost.toFixed(2);
+    newItem.production_cost_difference = cost.diff.toFixed(2);
     return newItem;
   } catch (error) {
     console.error('Failed to add product:', error);
@@ -63,9 +66,10 @@ export const updateProduct = async (itemId: number, updatedItem) => {
   }
 };
 
-export const deleteProductComposition = async (itemId: number) => {
+export const deleteProductComposition = async (itemId: number, productId) => {
   try {
     await db.delete(productComposition).where(eq(productComposition.composition_id, itemId));
+    await updateProductCost(productId);
   } catch (error) {
     console.error('Failed to delete product:', error);
     throw new Error('Failed to delete product.');
@@ -80,15 +84,20 @@ export const addProductComposition = async (newItem, productId) => {
       .values(newItem)
       .returning({ insertedId: productComposition.composition_id });
     newItem.composition_id = addedItem[0].insertedId;
+
+    await updateProductCost(productId);
+
     return newItem;
   } catch (error) {
     console.error('Failed to add product:', error);
     throw new Error('Failed to add product.');
   }
 };
-export const updateProductComposition = async (itemId: number, updatedItem) => {
+export const updateProductComposition = async (itemId: number, updatedItem, productId) => {
   try {
     await db.update(productComposition).set(updatedItem).where(eq(productComposition.composition_id, itemId));
+
+    await updateProductCost(productId);
   } catch (error) {
     console.error('Failed to update product:', error);
     throw new Error('Failed to update product.');

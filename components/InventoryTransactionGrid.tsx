@@ -11,6 +11,10 @@ import DataGrid, {
   Summary,
   TotalItem,
   DataGridTypes,
+  FilterRow,
+  FilterPanel,
+  FilterBuilderPopup,
+  HeaderFilter,
 } from 'devextreme-react/data-grid';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -96,6 +100,10 @@ const InventoryTransactionGrid = ({ itemId, unit }: Props) => {
       }}
       columnAutoWidth={true}
       searchPanel={{ visible: true, width: 240, placeholder: 'Search...' }}>
+      {/* <FilterRow visible={true} /> */}
+      <FilterPanel visible={true} />
+      <HeaderFilter visible={true} />
+      <FilterBuilderPopup position="top" />
       <Editing
         refreshMode="reshape"
         mode="popup"
@@ -117,7 +125,7 @@ const InventoryTransactionGrid = ({ itemId, unit }: Props) => {
         <RequiredRule />
       </Column> */}
 
-      <Column dataField="transaction_type_id" caption="Transaction Type">
+      <Column dataField="transaction_type_id" caption="Transaction Type" defaultFilterValue={1}>
         <RequiredRule message="Type is required" />
         <Lookup
           dataSource={transactionTypes?.map((um) => ({
@@ -128,7 +136,11 @@ const InventoryTransactionGrid = ({ itemId, unit }: Props) => {
           displayExpr="text"
         />
       </Column>
-      <Column dataField="quantity" caption={`Quantity ${unit ? `(${unit})` : ''}`} dataType="number">
+      <Column
+        dataField="quantity"
+        caption={`Quantity ${unit ? `(${unit})` : ''}`}
+        dataType="number"
+        allowFiltering={false}>
         <RequiredRule />
       </Column>
       <Column
@@ -136,6 +148,7 @@ const InventoryTransactionGrid = ({ itemId, unit }: Props) => {
         caption="Price Per Unit"
         dataType="number"
         format={{ type: 'currency', currency: 'GBP', precision: 2 }}
+        allowFiltering={false}
       />
       <Column
         dataField="status"
@@ -151,9 +164,10 @@ const InventoryTransactionGrid = ({ itemId, unit }: Props) => {
         allowEditing={false}
         sortOrder="desc"
         sortIndex={0}
+        allowFiltering={false}
       />
 
-      <Column dataField="expected_date" caption="Expected Date" dataType="date" />
+      <Column dataField="expected_date" caption="Expected Date" dataType="date" allowFiltering={false} />
       <Column type="buttons">
         <Button
           text="Confirm"

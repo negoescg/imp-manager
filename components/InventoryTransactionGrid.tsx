@@ -11,7 +11,6 @@ import DataGrid, {
   Summary,
   TotalItem,
   DataGridTypes,
-  FilterRow,
   FilterPanel,
   FilterBuilderPopup,
   HeaderFilter,

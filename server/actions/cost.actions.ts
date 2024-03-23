@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { finalProducts, inventoryTransactions, productComposition } from '@/lib/schema';
+import { finalProducts, inventoryItems, inventoryTransactions, productComposition } from '@/lib/schema';
 import { and, asc, desc, eq } from 'drizzle-orm';
 
 export const calculateProductionCost = async (productId: number): Promise<{ newCost: number; initialCost: number }> => {
@@ -11,6 +11,11 @@ export const calculateProductionCost = async (productId: number): Promise<{ newC
   let totalCost = 0;
   let firstCost = 0;
   for (const { item_id, quantity_required } of requiredMaterials) {
+    const inventoryItem = await db.query.inventoryItems.findFirst({
+      where: eq(inventoryItems.item_id, item_id as number),
+    });
+
+    const isUnitKg = inventoryItem && inventoryItem.unit_of_measure_id === 3;
     const latestTransaction = await db.query.inventoryTransactions.findFirst({
       orderBy: [desc(inventoryTransactions.date_of_transaction)],
       where: and(
@@ -28,14 +33,19 @@ export const calculateProductionCost = async (productId: number): Promise<{ newC
       ),
     });
     if (latestTransaction) {
-      totalCost += parseFloat(
-        (parseFloat(latestTransaction.price_per_unit ?? '0') * parseFloat(quantity_required ?? '0')).toFixed(2),
-      );
+      let pricePerUnitLatest = parseFloat(latestTransaction.price_per_unit ?? '0');
+      if (isUnitKg) {
+        pricePerUnitLatest = pricePerUnitLatest / 1000;
+      }
+      totalCost += pricePerUnitLatest * parseFloat(quantity_required ?? '0');
     }
+
     if (firstTransaction) {
-      firstCost += parseFloat(
-        (parseFloat(firstTransaction.price_per_unit ?? '0') * parseFloat(quantity_required ?? '0')).toFixed(2),
-      );
+      let pricePerUnitFirst = parseFloat(firstTransaction.price_per_unit ?? '0');
+      if (isUnitKg) {
+        pricePerUnitFirst = pricePerUnitFirst / 1000;
+      }
+      firstCost += pricePerUnitFirst * parseFloat(quantity_required ?? '0');
     }
   }
 

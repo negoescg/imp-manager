@@ -45,6 +45,14 @@ export const navLinks = [
     visible: false,
     admin: false,
   },
+  {
+    id: 5,
+    text: 'Production History',
+    icon: 'dataarea',
+    href: '/history',
+    visible: false,
+    admin: true,
+  },
 ];
 const NavTabs = () => {
   const { user, isLoaded } = useUser();

@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm';
-import { serial, varchar, integer, decimal, pgTable, timestamp, bigint } from 'drizzle-orm/pg-core';
+import { serial, varchar, integer, decimal, pgTable, timestamp, bigint, pgView, text } from 'drizzle-orm/pg-core';
+import { and, asc, desc, eq } from 'drizzle-orm';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -89,6 +90,7 @@ export const productionLists = pgTable('production_lists', {
   name: varchar('name', { length: 255 }),
   list_date: timestamp('list_date').defaultNow(),
   status: varchar('status', { length: 255 }).default('In Progress'),
+  completed_date: timestamp('completed_date'),
 });
 
 export const productionListItems = pgTable('production_list_items', {
@@ -159,3 +161,34 @@ export const inventoryTransactionsRelations = relations(inventoryTransactions, (
     references: [transactionTypes.transaction_type_id],
   }),
 }));
+
+// export const prodHistoryView = pgView('prod_history_view').as((qb) =>
+//   qb
+//     .select({
+//       id: productionListItems.id,
+//       list_id: productionLists.id,
+//       sku: productionListItems.sku,
+//       required: productionListItems.required,
+//       completed: productionListItems.completed,
+//       stock: productionListItems.took_from_stock,
+//       name: productionListItems.name,
+//       list_date: productionLists.list_date,
+//       completed_date: productionLists.completed_date,
+//     })
+//     .from(productionListItems)
+//     .fullJoin(productionLists, eq(productionListItems.production_list_id, productionLists.id))
+//     .where(eq(productionLists.status, 'Completed')),
+// );
+
+export const prodHistoryView = pgView('prod_history_view', {
+  id: integer('id'),
+  list_id: integer('list_id'),
+  sku: text('sku'),
+  required: integer('required'),
+  completed: integer('completed'),
+  took_from_stock: integer('took_from_stock'),
+  name: text('name'),
+  list_date: timestamp('list_date'),
+  completed_date: timestamp('completed_date'),
+  type: text('type'),
+}).existing();

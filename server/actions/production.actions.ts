@@ -128,6 +128,7 @@ export const completeProductionList = async (id: number) => {
   });
   if (list) {
     list.status = 'Completed';
+    list.completed_date = new Date();
     await db.update(productionLists).set(list).where(eq(productionLists.id, id));
   }
   try {

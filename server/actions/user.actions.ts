@@ -16,6 +16,11 @@ interface ActionResult {
   error: string;
 }
 
+export const getUsers = async () => {
+  const selectResult = await db.query.users.findMany();
+  return selectResult;
+};
+
 export async function signInAction(_: ActionResult, formData: FormData): Promise<ActionResult> {
   const { data, error } = validateAuthFormData(formData);
   if (error !== null) return { error };

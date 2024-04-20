@@ -134,6 +134,20 @@
       "when": 1711286452326,
       "tag": "0018_fat_captain_flint",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1713610501973,
+      "tag": "0019_quick_miracleman",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1713614477626,
+      "tag": "0020_wakeful_wasp",
+      "breakpoints": true
     }
   ]
 }

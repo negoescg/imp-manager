@@ -13,7 +13,6 @@ import { useQuery } from '@tanstack/react-query';
 import CustomStore from 'devextreme/data/custom_store';
 import Link from 'next/link';
 import { getCategories } from '@/server/actions/product.actions';
-import ProductCompositionGrid from './ProductCompositionGrid';
 import { addCategory, deleteCategory, updateCategory } from '@/server/actions/category.actions';
 import CategoryProductTemplateCompositionGrid from './CategoryProductTemplateCompositionGrid';
 

@@ -27,11 +27,11 @@ import Link from 'next/link';
 import InventoryTransactionGrid from './InventoryTransactionGrid';
 import { Button as NormalButton, FileUploader, Toast } from 'devextreme-react';
 import * as XLSX from 'xlsx';
-import { useUser } from '@clerk/nextjs';
 import DataSource from 'devextreme/data/data_source';
+import { useSession } from '@/providers/SessionProvider';
 
 const InventoryGrid = () => {
-  const { user, isLoaded } = useUser();
+  const { user } = useSession();
   const fileUploaderRef = useRef<FileUploader>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [fileData, setFileData] = useState<any[]>([]);
@@ -40,14 +40,14 @@ const InventoryGrid = () => {
   const listsDataGridRef = useRef<DataGrid>(null);
 
   useEffect(() => {
-    if (isLoaded && user) {
-      if (user.organizationMemberships.length > 0) {
-        if (user.organizationMemberships[0].role === 'org:admin') {
+    if (user) {
+      if (user.role.length > 0) {
+        if (user.role === 'admin') {
           setIsAdmin(true);
         }
       }
     }
-  }, [user, isLoaded]);
+  }, [user]);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['inventory'],

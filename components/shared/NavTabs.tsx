@@ -1,8 +1,9 @@
 'use client';
-import { UserButton, useUser } from '@clerk/nextjs';
+import { useSession } from '@/providers/SessionProvider';
 import { Tabs } from 'devextreme-react';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import SignOutBtn from '../auth/SignOutBtn';
 
 export const navLinks = [
   {
@@ -55,10 +56,9 @@ export const navLinks = [
   },
 ];
 const NavTabs = () => {
-  const { user, isLoaded } = useUser();
+  const { user } = useSession();
   const [showNav, setShowNav] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
-
   const router = useRouter();
   const pathname = usePathname();
 
@@ -66,9 +66,9 @@ const NavTabs = () => {
     router.push(e.itemData.href);
   };
   useEffect(() => {
-    if (isLoaded && user) {
-      if (user.organizationMemberships.length > 0) {
-        if (user.organizationMemberships[0].role === 'org:admin') {
+    if (user) {
+      if (user.role.length > 0) {
+        if (user.role === 'admin') {
           setShowNav(true);
 
           navLinks.forEach((element) => {
@@ -88,7 +88,7 @@ const NavTabs = () => {
         }
       }
     } else setShowNav(false);
-  }, [user, isLoaded, pathname]);
+  }, [user, pathname]);
   return showNav ? (
     <div className="flex items-center">
       {navLinks.filter((tab) => tab.visible !== false).length !== 0 && (
@@ -107,13 +107,13 @@ const NavTabs = () => {
         />
       )}
       <div className="flex p-3 justify-end">
-        <UserButton />
+        <SignOutBtn />
       </div>
     </div>
   ) : (
-    isLoaded && user && (
+    user && (
       <div className="flex w-full p-3 justify-end">
-        <UserButton />
+        <SignOutBtn />
       </div>
     )
   );

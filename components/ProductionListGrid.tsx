@@ -12,15 +12,15 @@ import {
   updateProductionList,
   uploadProductionList,
 } from '@/server/actions/production.actions';
-import { useUser } from '@clerk/nextjs';
 import { Button as NormalButton, DateBox, FileUploader, TextBox, Toast } from 'devextreme-react';
 import * as XLSX from 'xlsx';
 import DataSource from 'devextreme/data/data_source';
 import StatusCell from './StatusCell';
 import { confirm } from 'devextreme/ui/dialog';
+import { useSession } from '@/providers/SessionProvider';
 
 const ProductionListGrid = () => {
-  const { user, isLoaded } = useUser();
+  const { user } = useSession();
   const [isAdmin, setIsAdmin] = useState(false);
   const [fileData, setFileData] = useState<any[]>([]);
   const [toastVisible, setToastVisible] = useState(false);
@@ -32,14 +32,14 @@ const ProductionListGrid = () => {
   const listsDataGridRef = useRef<DataGrid>(null);
 
   useEffect(() => {
-    if (isLoaded && user) {
-      if (user.organizationMemberships.length > 0) {
-        if (user.organizationMemberships[0].role === 'org:admin') {
+    if (user) {
+      if (user.role.length > 0) {
+        if (user.role === 'admin') {
           setIsAdmin(true);
         }
       }
     }
-  }, [user, isLoaded]);
+  }, [user]);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['production'],

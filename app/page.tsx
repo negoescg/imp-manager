@@ -1,12 +1,7 @@
-// import { auth } from '@clerk/nextjs';
-// import Clerk from '@clerk/clerk-sdk-node';
+import { checkAuth } from '@/lib/auth/utils';
 
 export default async function Home() {
-  // const { userId } = auth();
-  // const orgList = await Clerk.users.getOrganizationMembershipList({
-  //   userId: userId ?? '',
-  // });
+  await checkAuth();
 
-  // const orgRole = orgList[0].role;
   return <div className="p-5">Instruction maybe depending on user role ?</div>;
 }

@@ -4,6 +4,7 @@ import { Tabs } from 'devextreme-react';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import SignOutBtn from '../auth/SignOutBtn';
+import { UserMenu } from '../ui/userMenu';
 
 export const navLinks = [
   {
@@ -107,13 +108,13 @@ const NavTabs = () => {
         />
       )}
       <div className="flex p-3 justify-end">
-        <SignOutBtn />
+        <UserMenu />
       </div>
     </div>
   ) : (
     user && (
       <div className="flex w-full p-3 justify-end">
-        <SignOutBtn />
+        <UserMenu />
       </div>
     )
   );

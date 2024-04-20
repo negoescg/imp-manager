@@ -4,9 +4,9 @@ import 'devextreme/dist/css/dx.light.css';
 import { Inter } from 'next/font/google';
 import NavTabs from '@/components/shared/NavTabs';
 import { Toaster } from 'sonner';
-import { ThemeProvider } from 'next-themes';
 import { SessionProvider } from '@/providers/SessionProvider';
 import { validateRequest } from '@/lib/auth/lucia';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 let title = 'Inventory/Production';
 let description = 'This app will manage the inventory and production';
@@ -33,7 +33,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <>
               <NavTabs />
               <main>
-                <Providers>{children}</Providers>
+                <Providers>
+                  <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
+                    {children}
+                  </ThemeProvider>
+                </Providers>
                 <Toaster richColors />
               </main>
             </>

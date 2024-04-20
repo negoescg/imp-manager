@@ -1,18 +1,18 @@
 {
-    "hasSrc": true,
-    "packages": [
-      "shadcn-ui",
-      "drizzle",
-      "lucia"
-    ],
-    "preferredPackageManager": "npm",
-    "t3": false,
-    "alias": "@",
-    "analytics": true,
-    "rootPath": "src/",
-    "componentLib": "shadcn-ui",
-    "driver": "pg",
-    "provider": "vercel-pg",
-    "orm": "drizzle",
-    "auth": "lucia"
-  }
+  "hasSrc": false,
+  "packages": [
+    "drizzle",
+    "lucia",
+    "shadcn-ui"
+  ],
+  "preferredPackageManager": "npm",
+  "t3": false,
+  "alias": "@",
+  "analytics": true,
+  "rootPath": "",
+  "orm": "drizzle",
+  "auth": "lucia",
+  "provider": "vercel-pg",
+  "driver": "pg",
+  "componentLib": "shadcn-ui"
+}

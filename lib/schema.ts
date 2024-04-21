@@ -64,7 +64,7 @@ export const inventoryItems = pgTable('inventory_items', {
   date_created: timestamp('date_created').defaultNow(),
   item_type_id: integer('item_type_id').references(() => itemTypes.type_id),
   unit_of_measure_id: integer('unit_of_measure_id').references(() => unitsOfMeasure.unit_id),
-  quantity: bigint('quantity', { mode: 'number' }),
+  quantity: decimal('quantity', { precision: 10, scale: 3 }),
 });
 
 export const finalProducts = pgTable('final_products', {
@@ -96,7 +96,7 @@ export const inventoryTransactions = pgTable('inventory_transactions', {
   item_id: integer('item_id').references(() => inventoryItems.item_id),
   transaction_type_id: integer('transaction_type_id').references(() => transactionTypes.transaction_type_id),
   date_of_transaction: timestamp('date_of_transaction').defaultNow(),
-  quantity: bigint('quantity', { mode: 'number' }),
+  quantity: decimal('quantity', { precision: 10, scale: 3 }),
   price_per_unit: decimal('price_per_unit', { precision: 10, scale: 2 }),
   total_amount: decimal('total_amount', { precision: 10, scale: 2 }),
   expected_date: timestamp('expected_date').default(new Date(new Date().setDate(new Date().getDate() + 7))),

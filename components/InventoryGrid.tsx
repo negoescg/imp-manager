@@ -188,7 +188,7 @@ const InventoryGrid = () => {
         </Column>
         {/* <Column dataField="item_description" caption="Description" /> */}
         <Column dataField="item_sku" caption="SKU"></Column>
-        <Column dataField="quantity" caption="Quantity" allowEditing={false} />
+        <Column dataField="quantity" dataType="number" caption="Quantity" allowEditing={false} />
         <Column dataField="unit_of_measure_id" caption="Unit Of Measure">
           <RequiredRule message="Unit of Measure is required" />
           <Lookup

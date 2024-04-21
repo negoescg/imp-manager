@@ -148,6 +148,13 @@
       "when": 1713614477626,
       "tag": "0020_wakeful_wasp",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "5",
+      "when": 1713710679727,
+      "tag": "0021_fixed_prowler",
+      "breakpoints": true
     }
   ]
 }

@@ -65,7 +65,7 @@ export const completeProductionList = async (id: number) => {
     where: eq(productionLists.id, id),
   });
   const listItems = await db.select().from(productionListItems).where(eq(productionListItems.production_list_id, id));
-  listItems.forEach(async (element) => {
+  for (const element of listItems) {
     const product = await db.query.finalProducts.findFirst({
       where: eq(finalProducts.sku, element.sku),
     });
@@ -81,11 +81,13 @@ export const completeProductionList = async (id: number) => {
             expected_date: new Date(),
             status: 'Confirmed',
             transaction_type_id: 2,
-            quantity: element.took_from_stock,
+            quantity: element.took_from_stock.toString(),
           } as Transaction;
 
           await db.insert(inventoryTransactions).values(newTransaction);
-          inventory.quantity = (inventory.quantity ?? 0) - (newTransaction.quantity ?? 0);
+          inventory.quantity = (
+            parseFloat(inventory.quantity ?? '0') - parseFloat(newTransaction.quantity ?? '0')
+          ).toString();
           await db.update(inventoryItems).set(inventory).where(eq(inventoryItems.item_id, inventory.item_id));
         }
       }
@@ -95,7 +97,7 @@ export const completeProductionList = async (id: number) => {
           .from(productComposition)
           .where(eq(productComposition.product_id, product.product_id));
 
-        compositionItems.forEach(async (composition) => {
+        for (const composition of compositionItems) {
           const inventory = await db.query.inventoryItems.findFirst({
             where: eq(inventoryItems.item_id, composition.item_id as number),
           });
@@ -107,25 +109,28 @@ export const completeProductionList = async (id: number) => {
               expected_date: new Date(),
               status: 'Confirmed',
               transaction_type_id: 2,
-              quantity:
+              quantity: (
                 element.completed *
                 parseFloat(
                   isKg
                     ? (parseFloat(composition.quantity_required ?? '0') / 1000).toFixed(3)
                     : composition.quantity_required ?? '0',
-                ),
+                )
+              ).toString(),
             } as Transaction;
 
             await db.insert(inventoryTransactions).values(newTransaction);
-            inventory.quantity = (inventory.quantity ?? 0) - (newTransaction.quantity ?? 0);
+            inventory.quantity = (
+              parseFloat(inventory.quantity ?? '0') - parseFloat(newTransaction.quantity ?? '0')
+            ).toString();
             await db.update(inventoryItems).set(inventory).where(eq(inventoryItems.item_id, inventory.item_id));
           }
-        });
+        }
       }
     } else {
       await db.insert(productionListOrphans).values(element);
     }
-  });
+  }
   if (list) {
     list.status = 'Completed';
     list.completed_date = new Date();

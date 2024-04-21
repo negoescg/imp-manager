@@ -40,13 +40,13 @@ export const addProduct = async (newItem) => {
 
     const templates = await getCategoryTemplate(newItem.category_id);
 
-    templates.forEach(async (element) => {
+    for (const element of templates) {
       await db.insert(productComposition).values({
         product_id: addedItem[0].insertedId,
         item_id: element.item_id,
         quantity_required: element.quantity_required,
       });
-    });
+    }
 
     const cost = await updateProductCost(addedItem[0].insertedId);
     newItem.production_cost = cost.newCost.toFixed(2);

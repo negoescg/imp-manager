@@ -79,8 +79,8 @@ export async function updateAllProductCosts(itemId: number): Promise<void> {
       .from(productComposition)
       .where(eq(productComposition.item_id, itemId));
 
-    products.forEach(async (product) => {
+    for (const product of products) {
       await updateProductCost(product.product_id as number);
-    });
+    }
   }
 }

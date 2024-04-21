@@ -91,10 +91,14 @@ export const deleteInventoryItemTransaction = async (itemId: number, inventoryIt
     });
     if (inventoryItemTransaction && inventoryItemTransaction.status !== 'Pending') {
       if (inventoryItemTransaction && inventoryItemTransaction.transaction_type_id === 1 && inventoryItem) {
-        inventoryItem.quantity = (inventoryItem.quantity ?? 0) - (inventoryItemTransaction.quantity ?? 0);
+        inventoryItem.quantity = (
+          parseFloat(inventoryItem.quantity ?? '0') - parseFloat(inventoryItemTransaction.quantity ?? '0')
+        ).toString();
         await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
       } else if (inventoryItemTransaction && inventoryItemTransaction.transaction_type_id === 2 && inventoryItem) {
-        inventoryItem.quantity = (inventoryItem.quantity ?? 0) + (inventoryItemTransaction.quantity ?? 0);
+        inventoryItem.quantity = (
+          parseFloat(inventoryItem.quantity ?? '0') + parseFloat(inventoryItemTransaction.quantity ?? '0')
+        ).toString();
         await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
       }
     }
@@ -126,7 +130,9 @@ export const addInventoryItemTransaction = async (newItem, id: number) => {
         inventoryItem.quantity = (inventoryItem.quantity ?? 0) + newItem.quantity;
         await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
       } else if (newItem.transaction_type_id === 2 && inventoryItem) {
-        inventoryItem.quantity = (inventoryItem.quantity ?? 0) - newItem.quantity;
+        inventoryItem.quantity = (
+          parseFloat(inventoryItem.quantity ?? '0') - parseFloat(newItem.quantity ?? '0')
+        ).toString();
         await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
       }
       await updateAllProductCosts(id as number);
@@ -152,10 +158,14 @@ export const confirmInventoryTransaction = async (id: number) => {
       await updateAllProductCosts(transactionItem.item_id as number);
     }
     if (transactionItem && transactionItem.transaction_type_id === 1 && inventoryItem) {
-      inventoryItem.quantity = (inventoryItem.quantity ?? 0) + (transactionItem.quantity ?? 0);
+      inventoryItem.quantity = (
+        parseFloat(inventoryItem.quantity ?? '0') + parseFloat(transactionItem.quantity ?? '0')
+      ).toString();
       await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
     } else if (transactionItem && transactionItem.transaction_type_id === 2 && inventoryItem) {
-      inventoryItem.quantity = (inventoryItem.quantity ?? 0) - (transactionItem.quantity ?? 0);
+      inventoryItem.quantity = (
+        parseFloat(inventoryItem.quantity ?? '0') - parseFloat(transactionItem.quantity ?? '0')
+      ).toString();
       await db.update(inventoryItems).set(inventoryItem).where(eq(inventoryItems.item_id, inventoryItem.item_id));
     }
   } catch (error) {
@@ -183,17 +193,27 @@ export const updateInventoryItemTransaction = async (itemId: number, updatedItem
           updatedItem.transaction_type_id === 2 &&
           inventoryItem
         ) {
-          inventoryItem.quantity = (inventoryItem.quantity ?? 0) - (inventoryItemTransaction.quantity ?? 0);
-          inventoryItem.quantity =
-            (inventoryItem.quantity ?? 0) - (updatedItem.quantity ?? inventoryItemTransaction.quantity ?? 0);
+          inventoryItem.quantity = (
+            parseFloat(inventoryItem.quantity ?? '0') - parseFloat(inventoryItemTransaction.quantity ?? '0')
+          ).toString();
+
+          inventoryItem.quantity = (
+            parseFloat(inventoryItem.quantity ?? '0') -
+            parseFloat(updatedItem.quantity ?? inventoryItemTransaction.quantity ?? '0')
+          ).toString();
         } else if (
           inventoryItemTransaction.transaction_type_id === 2 &&
           updatedItem.transaction_type_id === 1 &&
           inventoryItem
         ) {
-          inventoryItem.quantity = (inventoryItem.quantity ?? 0) + (inventoryItemTransaction.quantity ?? 0);
-          inventoryItem.quantity =
-            (inventoryItem.quantity ?? 0) + (updatedItem.quantity ?? inventoryItemTransaction.quantity ?? 0);
+          inventoryItem.quantity = (
+            parseFloat(inventoryItem.quantity ?? '0') + parseFloat(inventoryItemTransaction.quantity ?? '0')
+          ).toString();
+
+          inventoryItem.quantity = (
+            parseFloat(inventoryItem.quantity ?? '0') +
+            parseFloat(updatedItem.quantity ?? inventoryItemTransaction.quantity ?? '0')
+          ).toString();
         }
       } else if (
         inventoryItemTransaction &&
@@ -202,11 +222,19 @@ export const updateInventoryItemTransaction = async (itemId: number, updatedItem
         inventoryItem
       ) {
         if (updatedItem.transaction_type_id === 1) {
-          inventoryItem.quantity = (inventoryItem.quantity ?? 0) - (inventoryItemTransaction.quantity ?? 0);
-          inventoryItem.quantity = (inventoryItem.quantity ?? 0) + (updatedItem.quantity ?? 0);
+          inventoryItem.quantity = (
+            parseFloat(inventoryItem.quantity ?? '0') - parseFloat(inventoryItemTransaction.quantity ?? '0')
+          ).toString();
+          inventoryItem.quantity = (
+            parseFloat(inventoryItem.quantity ?? '0') + parseFloat(updatedItem.quantity ?? '0')
+          ).toString();
         } else if (updatedItem.transaction_type_id === 2) {
-          inventoryItem.quantity = (inventoryItem.quantity ?? 0) + (inventoryItemTransaction.quantity ?? 0);
-          inventoryItem.quantity = (inventoryItem.quantity ?? 0) - (updatedItem.quantity ?? 0);
+          inventoryItem.quantity = (
+            parseFloat(inventoryItem.quantity ?? '0') + parseFloat(inventoryItemTransaction.quantity ?? '0')
+          ).toString();
+          inventoryItem.quantity = (
+            parseFloat(inventoryItem.quantity ?? '0') - parseFloat(updatedItem.quantity ?? '0')
+          ).toString();
         }
       }
       if (inventoryItem) {
@@ -225,15 +253,59 @@ export const updateInventoryItemTransaction = async (itemId: number, updatedItem
 export const uploadInventoryList = async (items: string) => {
   try {
     const fileDataArray = JSON.parse(items);
-    const listItems = [] as any[];
-    fileDataArray.forEach((element) => {
-      listItems.push({
-        item_sku: element.Sku,
-        name: element.Name,
-        item_type_id: element.Type,
-        unit_of_measure_id: element.Unit,
+    console.log(fileDataArray[0][' PRICE']);
+    for (const element of fileDataArray) {
+      const inventoryItem = await db.query.inventoryItems.findFirst({
+        where: eq(inventoryItems.item_name, element.NAME ? element.NAME : ''),
       });
-    });
+      if (inventoryItem) {
+        const addedTransaction = await db
+          .insert(inventoryTransactions)
+          .values({
+            status: 'Pending',
+            transaction_type_id: 1,
+            item_id: inventoryItem.item_id,
+            quantity: element.QUANTITY,
+            date_of_transaction: new Date(),
+            price_per_unit: element.PRICE ? element.PRICE : element[' PRICE'],
+            total_amount: null,
+            expected_date: new Date(),
+          })
+          .returning({ insertedId: inventoryTransactions.transaction_id });
+        if (element.PRICE || element[' PRICE']) {
+          await confirmInventoryTransaction(addedTransaction[0].insertedId);
+        }
+      } else {
+        const addedItem = await db
+          .insert(inventoryItems)
+          .values({
+            item_name: element.NAME,
+            item_description: null,
+            item_sku: null,
+            date_created: new Date(),
+            item_type_id: element.TYPE,
+            unit_of_measure_id: element.UNIT,
+            quantity: '0',
+          })
+          .returning({ insertedId: inventoryItems.item_id });
+        const addedTransaction = await db
+          .insert(inventoryTransactions)
+          .values({
+            status: 'Pending',
+            transaction_type_id: 1,
+            item_id: addedItem[0].insertedId,
+            quantity: element.QUANTITY,
+            date_of_transaction: new Date(),
+            price_per_unit: element.PRICE ? element.PRICE : element[' PRICE'],
+            total_amount: null,
+            expected_date: new Date(),
+          })
+          .returning({ insertedId: inventoryTransactions.transaction_id });
+        if (element.QUANTITY && element.QUANTITY !== 0 && (element.PRICE || element[' PRICE'])) {
+          await confirmInventoryTransaction(addedTransaction[0].insertedId);
+        }
+      }
+    }
   } catch (error) {
     console.error('Failed to upload inventory list:', error);
     throw new Error('Failed to upload inventory list.');

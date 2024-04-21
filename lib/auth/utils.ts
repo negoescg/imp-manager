@@ -35,6 +35,12 @@ export const checkAuth = async () => {
   if (!session) redirect('/sign-in');
 };
 
+export const checkAuthAdmin = async () => {
+  const { session, user } = await validateRequest();
+  if (!session) redirect('/sign-in');
+  else if (user && user.role !== 'admin') redirect('/');
+};
+
 export const genericError = { error: 'Error, please try again.' };
 
 export const setAuthCookie = (cookie: Cookie) => {

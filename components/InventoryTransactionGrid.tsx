@@ -71,9 +71,9 @@ const InventoryTransactionGrid = ({ itemId, unit }: Props) => {
         case 'calculate':
           if (options.value.status === 'Confirmed') {
             if (options.value.transaction_type_id === 1) {
-              options.totalValue += options.value.quantity;
+              options.totalValue += parseFloat(options.value.quantity ?? '0');
             } else if (options.value.transaction_type_id === 2) {
-              options.totalValue -= options.value.quantity;
+              options.totalValue -= parseFloat(options.value.quantity ?? '0');
             }
           }
           break;

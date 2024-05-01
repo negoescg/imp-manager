@@ -107,16 +107,20 @@ export const updateProductComposition = async (itemId: number, updatedItem, prod
 export const uploadProductList = async (items: string) => {
   try {
     const fileDataArray = JSON.parse(items);
-    const listItems = [] as any[];
-    fileDataArray.forEach((element) => {
-      listItems.push({
-        sku: element.SKU,
-        required: element.RequiredByBackOrder,
-        original_required: element.RequiredByBackOrder,
-        completed: 0,
-        name: element.Name,
+
+    for (const element of fileDataArray) {
+      const product = await db.query.finalProducts.findFirst({
+        where: eq(finalProducts.sku, element.SKU ? element.SKU : ''),
       });
-    });
+      if (product) {
+      } else {
+        await addProduct({
+          name: element.Name,
+          category_id: element.Category,
+          sku: element.SKU,
+        });
+      }
+    }
   } catch (error) {
     console.error('Failed to update product:', error);
     throw new Error('Failed to update product.');

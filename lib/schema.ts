@@ -70,7 +70,7 @@ export const inventoryItems = pgTable('inventory_items', {
 export const finalProducts = pgTable('final_products', {
   product_id: serial('product_id').primaryKey(),
   sku: varchar('sku', { length: 255 }).unique(),
-  name: varchar('name', { length: 255 }).unique(),
+  name: varchar('name', { length: 255 }),
   category_id: integer('category_id').references(() => categories.category_id),
   production_cost: decimal('production_cost', { precision: 10, scale: 2 }),
   price: decimal('price', { precision: 10, scale: 2 }),

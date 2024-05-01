@@ -253,7 +253,6 @@ export const updateInventoryItemTransaction = async (itemId: number, updatedItem
 export const uploadInventoryList = async (items: string) => {
   try {
     const fileDataArray = JSON.parse(items);
-    console.log(fileDataArray[0][' PRICE']);
     for (const element of fileDataArray) {
       const inventoryItem = await db.query.inventoryItems.findFirst({
         where: eq(inventoryItems.item_name, element.NAME ? element.NAME : ''),

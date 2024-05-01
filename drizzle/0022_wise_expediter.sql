@@ -1,0 +1,2 @@
+ALTER TABLE "final_products" DROP CONSTRAINT "final_products_name_unique";--> statement-breakpoint
+ALTER TABLE "inventory_transactions" ALTER COLUMN "expected_date" SET DEFAULT '2024-05-08 19:05:26.719';
